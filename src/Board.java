@@ -8,8 +8,10 @@ import javax.swing.*;
  */
 class Board extends JPanel {
 	// FIELDS
-	
+	Piece[][] grid;
 	// CONSTRUCTORS
-	
+	Board() {
+	    grid = new Piece[8][8];
+    }
 	// METHODS
 }
