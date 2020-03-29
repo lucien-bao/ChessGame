@@ -6,8 +6,10 @@
  */
 class Board extends javax.swing.JPanel {
 	// FIELDS
-	
+	Piece[][] grid;
 	// CONSTRUCTORS
-	
+	Board() {
+	    grid = new Piece[8][8];
+    }
 	// METHODS
 }
