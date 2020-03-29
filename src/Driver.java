@@ -11,6 +11,6 @@ public class Driver {
 	 * @param args arguments passed through command line
 	 */
 	public static void main(String[] args) {
-		Applet applet = new Applet();
+		Frame frame = new Frame();
 	}
 }

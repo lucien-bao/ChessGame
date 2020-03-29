@@ -12,7 +12,4 @@ class Piece {
     // CONSTRUCTORS
 
     // METHODS
-    Piece[][] getPossibleMoves(Piece[][] currentBoard) {
-        return new Piece[8][8]; // filler return, will change later
-    }
 }
