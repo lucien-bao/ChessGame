@@ -5,7 +5,7 @@ import java.awt.*;
  * Frame class. This represents the game.
  * @author Chris W. Bao, Ben Megan
  * @since 28 MAR 2020
- * @version 0.1.1
+ * @version 0.1.2
  */
 class Frame extends JFrame {
     // CONSTANTS
@@ -18,7 +18,10 @@ class Frame extends JFrame {
     PlayerPanel blackPanel;
     PlayerPanel whitePanel;
 
-    // CONSTRUCTORS
+    // CONSTRUCTOR
+    /**
+     * Constructor. Initiates all the JPanels.
+     */
     Frame() {
         boardPanel = new BoardPanel();
         boardPanel.setBackground(Color.PINK);
