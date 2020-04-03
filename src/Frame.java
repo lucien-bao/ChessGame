@@ -6,7 +6,7 @@ import java.awt.event.*;
  * Frame class. This represents the game.
  * @author Chris W. Bao, Ben Megan
  * @since 28 MAR 2020
- * @version 0.1.2
+ * @version 0.1.3
  */
 class Frame extends JFrame implements ComponentListener {
     // CONSTANTS
