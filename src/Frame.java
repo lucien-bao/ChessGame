@@ -6,19 +6,23 @@ import java.awt.event.*;
  * Frame class. This represents the game.
  * @author Chris W. Bao, Ben Megan
  * @since 28 MAR 2020
- * @version 0.1.3
+ * @version 0.1.4
  */
 class Frame extends JFrame implements ComponentListener {
     // CONSTANTS
-    final int DEFAULT_WIDTH = 800;
-    final int DEFAULT_HEIGHT = 800;
-    Dimension size = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    // TODO: make it automatically fullscreen,
+    //  and add a button to toggle fullscreen/not fullscreen
+    final int MENU_BAR_HEIGHT = 22;
+    final int DEFAULT_WIDTH = 500;
+    final int DEFAULT_HEIGHT = 800 + MENU_BAR_HEIGHT;
 
     // FIELDS
-    BoardPanel boardPanel;  // Chessboard panel
-    InfoPanel infoPanel;    // General info panel
+    Dimension size = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    InfoPanel   infoPanel;  // General info panel
     PlayerPanel blackPanel; // Black player info panel
+    BoardPanel  boardPanel; // Chessboard panel
     PlayerPanel whitePanel; // White player info panel
+    Image       background; // Background for when the app is in fullscreen
 
     // CONSTRUCTOR
     /**
@@ -29,18 +33,27 @@ class Frame extends JFrame implements ComponentListener {
         addComponentListener(this);
         
         // Panel stuff
-        boardPanel = new BoardPanel();
-        boardPanel.setBackground(Color.PINK);
+        this.setLayout(null);
+        
         infoPanel  = new InfoPanel();
         infoPanel.setBackground(Color.GRAY);
+        infoPanel.setBounds(0, 0, 500, 100);
+        this.add(infoPanel);
+    
         blackPanel = new PlayerPanel();
         blackPanel.setBackground(Color.BLACK);
+        blackPanel.setBounds(0, 100, 500, 100);
+        this.add(blackPanel);
+        
+        boardPanel = new BoardPanel();
+        boardPanel.setBackground(Color.PINK);
+        boardPanel.setBounds(0, 200, 500, 500);
+        this.add(boardPanel);
+        
         whitePanel = new PlayerPanel();
         whitePanel.setBackground(Color.WHITE);
-        this.add(boardPanel, BorderLayout.CENTER);
-        this.add(infoPanel, BorderLayout.NORTH);
-        this.add(blackPanel, BorderLayout.WEST);
-        this.add(whitePanel, BorderLayout.EAST);
+        whitePanel.setBounds(0, 700, 500, 100);
+        this.add(whitePanel);
         
         // Misc. setup
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
