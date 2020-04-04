@@ -1,8 +1,8 @@
 /**
- * Piece class. Types of pieces and their possible moves.
+ * <code>Piece</code> class. Types of pieces and their possible moves.
  * @author Chris W. Bao, Ben Megan
- * @since 29 MAR 2020
- * @version 0.1.1
+ * @since 4 APR 2020
+ * @version 0.1.2
  */
 class Piece {
     // FIELDS

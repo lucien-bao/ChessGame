@@ -1,8 +1,8 @@
 /**
- * Driver class. The game is run through here.
+ * <code>Driver</code> class. The game is run through here.
  * @author Chris W. Bao, Ben Megan
- * @since 28 MAR 2020
- * @version 0.1.2
+ * @since 4 APR 2020
+ * @version 0.1.3
  */
 public class Driver {
 	// MAIN()
