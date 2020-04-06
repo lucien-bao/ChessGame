@@ -33,6 +33,8 @@ class Frame extends JFrame implements ComponentListener {
      * Constructor. Initiates all the <code>JPanels</code>.
      */
     Frame() {
+        super("JChess");
+        
         // Resizing stuff
         addComponentListener(this);
         
