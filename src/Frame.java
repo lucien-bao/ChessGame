@@ -8,7 +8,7 @@ import java.awt.event.*;
  * @since 4 APR 2020
  * @version 0.1.5
  */
-class Frame extends JFrame implements ComponentListener {
+class Frame extends JFrame implements ComponentListener, MouseListener {
     // CONSTANTS
     // TODO: make it automatically fullscreen,
     //  and add a button to toggle fullscreen/not fullscreen
@@ -18,7 +18,7 @@ class Frame extends JFrame implements ComponentListener {
     // Size of window to OS is (width, height + menu bar height)
     // Size of window to us is (width, height)
     final int MENU_BAR_HEIGHT = 22;
-    final int DEFAULT_WIDTH = 900;
+    final int DEFAULT_WIDTH = 800;
     final int DEFAULT_HEIGHT = 500;
 
     // FIELDS
@@ -37,28 +37,29 @@ class Frame extends JFrame implements ComponentListener {
         
         // Resizing stuff
         addComponentListener(this);
+        addMouseListener(this);
         
         // Panel stuff
         this.setLayout(null);
         
         infoPanel  = new InfoPanel();
         infoPanel.setBackground(Color.GRAY);
-        infoPanel.setBounds(0, 0, 200, 500);
+        infoPanel.setBounds(0, 0, 150, 500);
         this.add(infoPanel);
         
         boardPanel = new BoardPanel();
         boardPanel.setBackground(Color.PINK);
-        boardPanel.setBounds(200, 0, 500, 500);
+        boardPanel.setBounds(150, 0, 500, 500);
         this.add(boardPanel);
     
         blackPanel = new PlayerPanel();
         blackPanel.setBackground(Color.BLACK);
-        blackPanel.setBounds(700, 0, 200, 250);
+        blackPanel.setBounds(650, 0, 150, 250);
         this.add(blackPanel);
         
         whitePanel = new PlayerPanel();
         whitePanel.setBackground(Color.WHITE);
-        whitePanel.setBounds(700, 250, 200, 250);
+        whitePanel.setBounds(650, 250, 150, 250);
         this.add(whitePanel);
         
         // Misc. setup
@@ -73,37 +74,61 @@ class Frame extends JFrame implements ComponentListener {
      * Resizes the panels after the <code>JFrame</code> instance gets resized.
      */
     void resizePanels() {
-        int width = size.width;
-        int height = size.height;
-        if(width <= height) { // Portrait orientation
-            int outsideBoardLength = height-width;      // excess length outside boardPanel
+        int width    = size.width;
+        int height   = size.height;
+        int horShift = 0;
+        int verShift = 0;
+        int effectiveWidth  = width;
+        int effectiveHeight = height;
+        if(effectiveWidth <= effectiveHeight) { // Portrait orientation
+            if(Math.abs((float)height / width - 1.6) > 0.2) { // proportions are bad
+                if((float)height / width > 1.6) { // too tall
+                    effectiveHeight = (int)(1.8 * width);
+                    verShift = (height - effectiveHeight) / 2;
+                }
+                else { // too wide
+                    effectiveWidth  = (int)(height / 1.8);
+                    horShift = (width - effectiveWidth) / 2;
+                }
+            }
+            int outsideBoardLength = effectiveHeight-effectiveWidth;      // excess length outside boardPanel
             int sidePanelLength = outsideBoardLength/2; // height of infoPanels and playerPanels
-            int playerPanelWidth = width/2;             // width of playerPanels
-            infoPanel.changeSize(width, sidePanelLength);
-            infoPanel.setBounds(0, 0, width, sidePanelLength);
-            boardPanel.changeLength(width);
+            int playerPanelWidth = effectiveWidth/2;             // width of playerPanels
+            infoPanel.changeSize(effectiveWidth, sidePanelLength);
+            infoPanel.setBounds(horShift, verShift, effectiveWidth, sidePanelLength);
+            boardPanel.changeLength(effectiveWidth);
             //noinspection SuspiciousNameCombination
-            boardPanel.setBounds(0, sidePanelLength, width, width);
+            boardPanel.setBounds(horShift, sidePanelLength + verShift, effectiveWidth, effectiveWidth);
             blackPanel.changeSize(playerPanelWidth, sidePanelLength);
-            blackPanel.setBounds(0, sidePanelLength+width,
+            blackPanel.setBounds(horShift, sidePanelLength + effectiveWidth + verShift,
                     playerPanelWidth, sidePanelLength);
             whitePanel.changeSize(playerPanelWidth, sidePanelLength);
-            whitePanel.setBounds(playerPanelWidth, sidePanelLength+width,
+            whitePanel.setBounds(playerPanelWidth + horShift, sidePanelLength + effectiveWidth + verShift,
                     playerPanelWidth, sidePanelLength);
         } else {              // Landscape orientation
-            int outsideBoardLength = width-height;      // excess length outside boardPanel
+            if(Math.abs((float)width / height - 1.6) > 0.2) { // proportions are bad
+                if((float)width / height > 1.6) { // too wide
+                    effectiveWidth  = (int)(1.8 * height);
+                    horShift = (width - effectiveWidth) / 2;
+                }
+                else { // too tall
+                    effectiveHeight = (int)(width / 1.8);
+                    verShift = (height - effectiveHeight) / 2;
+                }
+            }
+            int outsideBoardLength = effectiveWidth-effectiveHeight;      // excess length outside boardPanel
             int sidePanelLength = outsideBoardLength/2; // width of infoPanels and playerPanels
-            int playerPanelHeight = height/2;           // height of playerPanels
-            infoPanel.changeSize(sidePanelLength, height);
-            infoPanel.setBounds(0, 0, sidePanelLength, height);
-            boardPanel.changeLength(height);
+            int playerPanelHeight = effectiveHeight/2;           // height of playerPanels
+            infoPanel.changeSize(sidePanelLength, effectiveHeight);
+            infoPanel.setBounds(horShift, verShift, sidePanelLength, effectiveHeight);
+            boardPanel.changeLength(effectiveHeight);
             //noinspection SuspiciousNameCombination
-            boardPanel.setBounds(sidePanelLength, 0, height, height);
+            boardPanel.setBounds(sidePanelLength + horShift, verShift, effectiveHeight, effectiveHeight);
             blackPanel.changeSize(sidePanelLength, playerPanelHeight);
-            blackPanel.setBounds(sidePanelLength+height, 0,
+            blackPanel.setBounds(sidePanelLength + effectiveHeight + horShift, verShift,
                     sidePanelLength, playerPanelHeight);
             whitePanel.changeSize(sidePanelLength, playerPanelHeight);
-            whitePanel.setBounds(sidePanelLength+height, playerPanelHeight,
+            whitePanel.setBounds(sidePanelLength + effectiveHeight + horShift, playerPanelHeight + verShift,
                     sidePanelLength, playerPanelHeight);
         }
     }
@@ -126,4 +151,22 @@ class Frame extends JFrame implements ComponentListener {
     public void componentShown(ComponentEvent e) {}
     @Override
     public void componentHidden(ComponentEvent e) {}
+
+    // MOUSELISTENER METHODS
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
+        System.out.println(size.width + ", " + size.height);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {}
+
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {}
+
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {}
+
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {}
 }
