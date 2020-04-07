@@ -2,4 +2,4 @@ ChessGame
 Chess game applet.
 Authors: Chris W. Bao and Ben Megan
 Date created: 28 MAR 2020
-Last modified: 4 APR 2020 by Chris W. Bao
+Last modified: 7 APR 2020 by Ben C. Megan
