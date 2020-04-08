@@ -6,7 +6,7 @@ import java.awt.event.*;
  * <code>Frame</code> class. This represents the game.
  * @author Chris W. Bao, Ben Megan
  * @since 4 APR 2020
- * @version 0.1.6
+ * @version 0.1.7
  */
 class Frame extends JFrame implements ComponentListener, MouseListener {
     // CONSTANTS
@@ -131,6 +131,7 @@ class Frame extends JFrame implements ComponentListener, MouseListener {
             whitePanel.setBounds(sidePanelLength + effectiveHeight + horShift, playerPanelHeight + verShift,
                     sidePanelLength, playerPanelHeight);
         }
+        boardPanel.repaint(); // redraws everything
     }
     
     // COMPONENTLISTER METHODS
