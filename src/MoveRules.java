@@ -84,44 +84,44 @@ abstract class MoveRules {
 	boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[8][8];
 		boolean knightColor = board[rank][file].isWhite;
-		if(rank <= 6 && file <= 7
-				&& board[rank + 2][file + 1] == null
-				|| board[rank + 2][file + 1].isWhite != knightColor) {
+		if((rank <= 6 && file <= 7)
+				&& (board[rank + 2][file + 1] == null
+				|| board[rank + 2][file + 1].isWhite != knightColor)) {
 			possibleMoves[rank + 2][file + 1] = true;
 		}
-		if(rank <= 7 && file <= 6
-				&& board[rank + 1][file + 2] == null
-				|| board[rank + 1][file + 2].isWhite != knightColor) {
+		if((rank <= 7 && file <= 6)
+				&& (board[rank + 1][file + 2] == null
+				|| board[rank + 1][file + 2].isWhite != knightColor)) {
 			possibleMoves[rank + 1][file + 2] = true;
 		}
-		if(rank >= 2 && file <= 6
-				&& board[rank - 1][file + 2] == null
-				|| board[rank - 1][file + 2].isWhite != knightColor) {
+		if((rank >= 2 && file <= 6)
+				&& (board[rank - 1][file + 2] == null
+				|| board[rank - 1][file + 2].isWhite != knightColor)) {
 			possibleMoves[rank - 1][file + 2] = true;
 		}
-		if(rank >= 3 && file <= 7
-				&& board[rank - 2][file + 1] == null
-				|| board[rank - 2][file + 1].isWhite != knightColor) {
+		if((rank >= 3 && file <= 7)
+				&& (board[rank - 2][file + 1] == null
+				|| board[rank - 2][file + 1].isWhite != knightColor)) {
 			possibleMoves[rank - 2][file + 1] = true;
 		}
-		if(rank >= 3 && file >= 2
-				&& board[rank - 2][file - 1] == null
-				|| board[rank - 2][file - 1].isWhite != knightColor) {
+		if((rank >= 3 && file >= 2)
+				&& (board[rank - 2][file - 1] == null
+				|| board[rank - 2][file - 1].isWhite != knightColor)) {
 			possibleMoves[rank - 2][file - 1] = true;
 		}
-		if(rank >= 2 && file >= 3
-				&& board[rank - 1][file - 2] == null
-				|| board[rank - 1][file - 2].isWhite != knightColor) {
+		if((rank >= 2 && file >= 3)
+				&& (board[rank - 1][file - 2] == null
+				|| board[rank - 1][file - 2].isWhite != knightColor)) {
 			possibleMoves[rank - 1][file - 2] = true;
 		}
-		if(rank <= 7 && file >= 3
-				&& board[rank + 1][file - 2] == null
-				|| board[rank + 1][file - 2].isWhite != knightColor) {
+		if((rank <= 7 && file >= 3)
+				&& (board[rank + 1][file - 2] == null
+				|| board[rank + 1][file - 2].isWhite != knightColor)) {
 			possibleMoves[rank + 1][file - 2] = true;
 		}
-		if(rank <= 6 && file >= 2
-				&& board[rank + 2][file - 1] == null
-				|| board[rank + 2][file - 1].isWhite != knightColor) {
+		if((rank <= 6 && file >= 2)
+				&& (board[rank + 2][file - 1] == null
+				|| board[rank + 2][file - 1].isWhite != knightColor)) {
 			possibleMoves[rank + 2][file - 1] = true;
 		}
 
