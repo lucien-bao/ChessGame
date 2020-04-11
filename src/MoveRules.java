@@ -50,28 +50,28 @@ abstract class MoveRules {
 		boolean[][] possibleMoves = new boolean[10][10]; // default value is false
 		int pawnColor = board[rank][file].teamColor;
 		if(pawnColor == Piece.BLACK) { // separation of black and white possible moves is only needed for pawns
-			if(board[rank + 1][file] == null) { // move one square forward
+			if(board[rank + 1][file].teamColor == Piece.EMPTY) { // move one square forward
 				possibleMoves[rank + 1][file] = true;
-				if(rank == 2 && board[rank + 2][file] == null) // move two squares forward
+				if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY) // move two squares forward
 					possibleMoves[rank + 2][file] = true;
 			}
-			if(file != 1 && board[rank + 1][file - 1] != null
+			if(file != 1 && board[rank + 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file - 1].teamColor) // capture down and left
 				possibleMoves[rank + 1][file - 1] = true;
-			if(file != 8 && board[rank + 1][file + 1] != null
+			if(file != 8 && board[rank + 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file + 1].teamColor) // capture down and right
 				possibleMoves[rank + 1][file + 1] = true;
 		}
 		else { // white pawn
-			if(board[rank - 1][file] == null) { // move one square forward
+			if(board[rank - 1][file].teamColor == Piece.EMPTY) { // move one square forward
 				possibleMoves[rank - 1][file] = true;
-				if(rank == 7 && board[rank - 2][file] == null) // move two squares forward
+				if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY) // move two squares forward
 					possibleMoves[rank - 2][file] = true;
 			}
-			if(file != 1 && board[rank - 1][file - 1] != null
+			if(file != 1 && board[rank - 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file - 1].teamColor) // capture up and left
 				possibleMoves[rank - 1][file - 1] = true;
-			if(file != 8 && board[rank - 1][file + 1] != null
+			if(file != 8 && board[rank - 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file + 1].teamColor) // capture up and right
 				possibleMoves[rank - 1][file + 1] = true;
 		}

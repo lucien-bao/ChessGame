@@ -40,7 +40,7 @@ class BoardPanel extends JPanel {
         }
         // TEST OF getPossibleMoves METHOD
         // TODO: remove this
-        grid[2][3] = new Piece(Piece.WHITE_KNIGHT);
+        grid[7][7] = new Piece(Piece.WHITE_PAWN);
 	}
 	
 	// METHODS
@@ -94,41 +94,37 @@ class BoardPanel extends JPanel {
 				// TODO: draw pieces
 			}
 		}
-		// Number squares
-		for(int i = 8; i >= 1; i--) {
-			int j = i - 1;
-			// TODO: draw numbers.
-			//  Params are (outsideGrid / 2, outsideGrid / 2 + (8 - i) * squareSize, squareSize, squareSize, this)
-			//  and (ousideGrid / 2 + 8 * squareSize, outsideGrid / 2 + (8 - i) * squareSize, squareSize, this)
-		}
-		// Letter squares
-		for(int i = 'a'; i <= 'h'; i++) {
-			int j = i - 'a';
-			// TODO: draw letters.
-			//  Params are (outsideGrid / 2 + j * squareSize, outsideGrid / 2, squareSize, squareSize, this)
-			//  and (outsideGrid / 2 + j * squareSize, outsideGrid / 2 + 8 * squareSize, squareSize, this)
-		}
 
 		// DRAW PIECES
-        for (int rank = 1; rank < 9; rank++) {
-            for (int file = 1; file < 9; file++) {
-                // TODO: remove this, it's just a test
-                if(grid[rank][file].type == Piece.WHITE_KNIGHT) {
-                    graphics2d.setColor(Color.GREEN);
-                    graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-                            squareSize, squareSize);
+        for (int rank = 0; rank < 10; rank++) {
+            for (int file = 0; file < 10; file++) {
+                if(rank == 0 || rank == 9) {
+                    if(file == 0 || file == 9)
+                        continue;
+                    int y = rank * squareSize + outsideGrid / 2;
+                    int x = file * squareSize + outsideGrid / 2;
+                    graphics2d.setColor(Color.CYAN);
+                    graphics2d.fillOval(x, y, squareSize, squareSize);
                 }
-            }
-        }
-        // DRAW POSSIBLE MOVES OF A PIECE
-        // TODO: remove this, it's just a test
-        boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, 2, 3);
-        graphics2d.setColor(Color.RED);
-        for (int rank = 1; rank < 9; rank++) {
-            for (int file = 1; file < 9; file++) {
-                if(possibleMoves[rank][file]) {
-                    graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-                            squareSize, squareSize);
+                else if(file == 0 || file == 9) {
+                    int y = rank * squareSize + outsideGrid / 2;
+                    int x = file * squareSize + outsideGrid / 2;
+                    graphics2d.setColor(Color.MAGENTA);
+                    graphics2d.fillOval(x, y, squareSize, squareSize);
+                }
+                else {
+                    boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, 7, 7);
+                    // TODO: remove this, it's just a test
+                    if (grid[rank][file].type == Piece.WHITE_PAWN) {
+                        graphics2d.setColor(Color.GREEN);
+                        graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+                                squareSize, squareSize);
+                    }
+                    graphics2d.setColor(Color.RED);
+                    if (possibleMoves[rank][file]) {
+                        graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+                                squareSize, squareSize);
+                    }
                 }
             }
         }

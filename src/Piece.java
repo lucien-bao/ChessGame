@@ -22,6 +22,24 @@ class Piece {
 	static final int BLACK_KING    = 12;
 	static final int WHITE		   = 1;
 	static final int BLACK		   = 2;
+
+	static final int LABEL_ONE     = -1;
+	static final int LABEL_TWO     = -2;
+	static final int LABEL_THREE   = -3;
+	static final int LABEL_FOUR    = -4;
+	static final int LABEL_FIVE    = -5;
+	static final int LABEL_SIX     = -6;
+	static final int LABEL_SEVEN   = -7;
+	static final int LABEL_EIGHT   = -8;
+
+	static final int LABEL_A   = -11;
+	static final int LABEL_B   = -12;
+	static final int LABEL_C   = -13;
+	static final int LABEL_D   = -14;
+	static final int LABEL_E   = -15;
+	static final int LABEL_F   = -16;
+	static final int LABEL_G   = -17;
+	static final int LABEL_H   = -18;
 	
 	// FIELDS
 	int teamColor;
