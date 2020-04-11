@@ -6,22 +6,18 @@ import java.awt.image.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.6
+ * @version 0.1.7
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel {
 	// CONSTANTS
 	final Color LIGHT_SQUARE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.9f));
-	final Color DARK_SQUARE_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.5f));
+	final Color DARK_SQUARE_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.6f));
+	final Color BACKGROUND_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.3f));
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
-	
-	// IMAGES
-	BufferedImage[] pieces;
-	BufferedImage[] numbers;
-	BufferedImage[] letters;
 	
 	// FIELDS
 	Piece[][] grid;
@@ -31,6 +27,8 @@ class BoardPanel extends JPanel {
 	
 	// CONSTRUCTORS
 	BoardPanel() {
+		this.setBackground(BACKGROUND_COLOR);
+		
 		grid = new Piece[10][10];
 		// makes all pieces empty squares to start
         for (int rank = 1; rank < 9; rank++) {
@@ -77,27 +75,9 @@ class BoardPanel extends JPanel {
 		super.paintComponent(graphics);
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		graphics2d.setRenderingHints(RENDERING_HINTS);
-		
-		// Board squares
-		for(int rank = 1; rank < 9; rank++) {
-			for(int file = 1; file < 9; file++) {
-				// Square background
-				if((file + rank) % 2 == 0)
-					graphics2d.setColor(LIGHT_SQUARE_COLOR);
-				else
-					graphics2d.setColor(DARK_SQUARE_COLOR);
-				
-				graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-						squareSize, squareSize);
-				
-				// Pieces
-				// TODO: draw pieces
-			}
-		}
-
-		// DRAW PIECES
-        for (int rank = 0; rank < 10; rank++) {
-            for (int file = 0; file < 10; file++) {
+        for(int rank = 0; rank < 10; rank++) {
+            for(int file = 0; file < 10; file++) {
+            	// NUMBER SQUARES
                 if(rank == 0 || rank == 9) {
                     if(file == 0 || file == 9)
                         continue;
@@ -106,22 +86,33 @@ class BoardPanel extends JPanel {
                     graphics2d.setColor(Color.CYAN);
                     graphics2d.fillOval(x, y, squareSize, squareSize);
                 }
+                // LETTER SQUARES
                 else if(file == 0 || file == 9) {
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
                     graphics2d.setColor(Color.MAGENTA);
                     graphics2d.fillOval(x, y, squareSize, squareSize);
                 }
+                // PIECES/EMPTY SQUARES
                 else {
+	                // Square background
+	                if((file + rank) % 2 == 0)
+		                graphics2d.setColor(LIGHT_SQUARE_COLOR);
+	                else
+		                graphics2d.setColor(DARK_SQUARE_COLOR);
+	
+	                graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+			                squareSize, squareSize);
+                	
+                	// TODO: just test stuff
                     boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, 7, 7);
-                    // TODO: remove this, it's just a test
-                    if (grid[rank][file].type == Piece.WHITE_PAWN) {
+                    if(grid[rank][file].type == Piece.WHITE_PAWN) {
                         graphics2d.setColor(Color.GREEN);
                         graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
                                 squareSize, squareSize);
                     }
                     graphics2d.setColor(Color.RED);
-                    if (possibleMoves[rank][file]) {
+                    if(possibleMoves[rank][file]) {
                         graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
                                 squareSize, squareSize);
                     }

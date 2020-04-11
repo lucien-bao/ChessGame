@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 /**
  * <code>Frame</code> class. This represents the game.
@@ -40,6 +41,9 @@ class Frame extends JFrame implements ComponentListener, MouseListener {
 	Frame() {
 		super("JChess");
 		
+		// Images
+		Piece.loadImages(this);
+		
 		// Resizing stuff
 		addComponentListener(this);
 		addMouseListener(this);
@@ -53,7 +57,6 @@ class Frame extends JFrame implements ComponentListener, MouseListener {
 		this.add(infoPanel);
 		
 		boardPanel = new BoardPanel();
-		boardPanel.setBackground(Color.PINK);
 		boardPanel.setBounds(150, 0, 500, 500);
 		this.add(boardPanel);
 		

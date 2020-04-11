@@ -2,7 +2,7 @@
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if moves are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.2
+ * @version 0.1.3
  * @since 9 APR 2020
  */
 abstract class MoveRules {
