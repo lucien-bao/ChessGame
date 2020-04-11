@@ -23,18 +23,18 @@ abstract class MoveRules {
 	 * Gets possible moves of a specific piece
 	 * Calls a specific helper method based on the piece type
 	 * @param board the current pieces on the board
-	 * @param rank the rank of the piece to move
-	 * @param file the file of the piece to move
+	 * @param pieceRank the rank of the piece to move
+	 * @param pieceFile the file of the piece to move
 	 * @return the possible moves of the piece
 	 */
-	boolean[][] getPossibleMoves(Piece[][] board, int rank, int file) {
-		Piece toMove = board[rank][file];
-		boolean[][] possibleMoves = new boolean[8][8];
+	static boolean[][] getPossibleMoves(Piece[][] board, int pieceRank, int pieceFile) {
+		Piece toMove = board[pieceRank][pieceFile];
+		boolean[][] possibleMoves = new boolean[10][10];
 		int pieceType = toMove.type;
 		if(pieceType == Piece.BLACK_PAWN || pieceType == Piece.WHITE_PAWN)
-			possibleMoves = getPawnMoves(board, rank, file);
+			possibleMoves = getPawnMoves(board, pieceRank, pieceFile);
 		if(pieceType == Piece.BLACK_KNIGHT || pieceType == Piece.WHITE_KNIGHT)
-			possibleMoves = getKnightMoves(board, rank, file);
+			possibleMoves = getKnightMoves(board, pieceRank, pieceFile);
 		// TODO: Call helper methods (which will be written) to determine possible moves.
 		return possibleMoves;
 	}
@@ -46,8 +46,8 @@ abstract class MoveRules {
 	 * @param file the file of the pawn
 	 * @return the possible moves of the pawn
 	 */
-	boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
-		boolean[][] possibleMoves = new boolean[8][8]; // default value is false
+	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
+		boolean[][] possibleMoves = new boolean[10][10]; // default value is false
 		int pawnColor = board[rank][file].teamColor;
 		if(pawnColor == Piece.BLACK) { // separation of black and white possible moves is only needed for pawns
 			if(board[rank + 1][file] == null) { // move one square forward
@@ -85,8 +85,8 @@ abstract class MoveRules {
 	 * @param file the file of the knight
 	 * @return the possible moves of the knight
 	 */
-	boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
-		boolean[][] possibleMoves = new boolean[8][8];
+	static boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
+		boolean[][] possibleMoves = new boolean[10][10];
 		int knightColor = board[rank][file].teamColor;
 		int[] xOffsets = new int[] {-2, -2, -1, -1, +1, +1, +2, +2};
 		int[] yOffsets = new int[] {-1, +1, -2, +2, -2, +2, -1, +1};

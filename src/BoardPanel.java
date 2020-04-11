@@ -32,6 +32,15 @@ class BoardPanel extends JPanel {
 	// CONSTRUCTORS
 	BoardPanel() {
 		grid = new Piece[10][10];
+		// makes all pieces empty squares to start
+        for (int rank = 1; rank < 9; rank++) {
+            for (int file = 1; file < 9; file++) {
+                grid[rank][file] = new Piece(Piece.EMPTY);
+            }
+        }
+        // TEST OF getPossibleMoves METHOD
+        // TODO: remove this
+        grid[2][3] = new Piece(Piece.WHITE_KNIGHT);
 	}
 	
 	// METHODS
@@ -99,5 +108,29 @@ class BoardPanel extends JPanel {
 			//  Params are (outsideGrid / 2 + j * squareSize, outsideGrid / 2, squareSize, squareSize, this)
 			//  and (outsideGrid / 2 + j * squareSize, outsideGrid / 2 + 8 * squareSize, squareSize, this)
 		}
+
+		// DRAW PIECES
+        for (int rank = 1; rank < 9; rank++) {
+            for (int file = 1; file < 9; file++) {
+                // TODO: remove this, it's just a test
+                if(grid[rank][file].type == Piece.WHITE_KNIGHT) {
+                    graphics2d.setColor(Color.GREEN);
+                    graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+                            squareSize, squareSize);
+                }
+            }
+        }
+        // DRAW POSSIBLE MOVES OF A PIECE
+        // TODO: remove this, it's just a test
+        boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, 2, 3);
+        graphics2d.setColor(Color.RED);
+        for (int rank = 1; rank < 9; rank++) {
+            for (int file = 1; file < 9; file++) {
+                if(possibleMoves[rank][file]) {
+                    graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+                            squareSize, squareSize);
+                }
+            }
+        }
 	}
 }
