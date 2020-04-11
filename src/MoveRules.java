@@ -48,16 +48,18 @@ abstract class MoveRules {
 	 */
 	boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[8][8]; // default value is false
-		boolean isWhite = board[rank][file].isWhite;
-		if(!isWhite) { // separation of black and white possible moves is only needed for pawns
+		int pawnColor = board[rank][file].teamColor;
+		if(pawnColor == Piece.BLACK) { // separation of black and white possible moves is only needed for pawns
 			if(board[rank + 1][file] == null) { // move one square forward
 				possibleMoves[rank + 1][file] = true;
 				if(rank == 2 && board[rank + 2][file] == null) // move two squares forward
 					possibleMoves[rank + 2][file] = true;
 			}
-			if(file != 1 && board[rank + 1][file - 1] != null && board[rank + 1][file - 1].isWhite) // capture down and left
+			if(file != 1 && board[rank + 1][file - 1] != null
+					&& pawnColor != board[rank + 1][file - 1].teamColor) // capture down and left
 				possibleMoves[rank + 1][file - 1] = true;
-			if(file != 8 && board[rank + 1][file + 1] != null && board[rank + 1][file + 1].isWhite) // capture down and right
+			if(file != 8 && board[rank + 1][file + 1] != null
+					&& pawnColor != board[rank + 1][file + 1].teamColor) // capture down and right
 				possibleMoves[rank + 1][file + 1] = true;
 		}
 		else { // white pawn
@@ -66,9 +68,11 @@ abstract class MoveRules {
 				if(rank == 7 && board[rank - 2][file] == null) // move two squares forward
 					possibleMoves[rank - 2][file] = true;
 			}
-			if(file != 1 && board[rank - 1][file - 1] != null && !board[rank - 1][file - 1].isWhite) // capture up and left
+			if(file != 1 && board[rank - 1][file - 1] != null
+					&& pawnColor != board[rank - 1][file - 1].teamColor) // capture up and left
 				possibleMoves[rank - 1][file - 1] = true;
-			if(file != 8 && board[rank - 1][file + 1] != null && !board[rank - 1][file + 1].isWhite) // capture up and right
+			if(file != 8 && board[rank - 1][file + 1] != null
+					&& pawnColor != board[rank - 1][file + 1].teamColor) // capture up and right
 				possibleMoves[rank - 1][file + 1] = true;
 		}
 		return possibleMoves;
@@ -83,46 +87,16 @@ abstract class MoveRules {
 	 */
 	boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[8][8];
-		boolean knightColor = board[rank][file].isWhite;
-		if((rank <= 6 && file <= 7)
-				&& (board[rank + 2][file + 1] == null
-				|| board[rank + 2][file + 1].isWhite != knightColor)) {
-			possibleMoves[rank + 2][file + 1] = true;
-		}
-		if((rank <= 7 && file <= 6)
-				&& (board[rank + 1][file + 2] == null
-				|| board[rank + 1][file + 2].isWhite != knightColor)) {
-			possibleMoves[rank + 1][file + 2] = true;
-		}
-		if((rank >= 2 && file <= 6)
-				&& (board[rank - 1][file + 2] == null
-				|| board[rank - 1][file + 2].isWhite != knightColor)) {
-			possibleMoves[rank - 1][file + 2] = true;
-		}
-		if((rank >= 3 && file <= 7)
-				&& (board[rank - 2][file + 1] == null
-				|| board[rank - 2][file + 1].isWhite != knightColor)) {
-			possibleMoves[rank - 2][file + 1] = true;
-		}
-		if((rank >= 3 && file >= 2)
-				&& (board[rank - 2][file - 1] == null
-				|| board[rank - 2][file - 1].isWhite != knightColor)) {
-			possibleMoves[rank - 2][file - 1] = true;
-		}
-		if((rank >= 2 && file >= 3)
-				&& (board[rank - 1][file - 2] == null
-				|| board[rank - 1][file - 2].isWhite != knightColor)) {
-			possibleMoves[rank - 1][file - 2] = true;
-		}
-		if((rank <= 7 && file >= 3)
-				&& (board[rank + 1][file - 2] == null
-				|| board[rank + 1][file - 2].isWhite != knightColor)) {
-			possibleMoves[rank + 1][file - 2] = true;
-		}
-		if((rank <= 6 && file >= 2)
-				&& (board[rank + 2][file - 1] == null
-				|| board[rank + 2][file - 1].isWhite != knightColor)) {
-			possibleMoves[rank + 2][file - 1] = true;
+		int knightColor = board[rank][file].teamColor;
+		int[] xOffsets = new int[] {-2, -2, -1, -1, +1, +1, +2, +2};
+		int[] yOffsets = new int[] {-1, +1, -2, +2, -2, +2, -1, +1};
+		for(int i = 0; i < 8; i++) {
+			int newRank = rank + xOffsets[i];
+			int newFile = file + yOffsets[i];
+			if(newRank >= 1 && newRank <= 8
+				&& newFile >= 1 && newFile <= 8
+				&& board[newRank][newFile].teamColor != knightColor)
+				possibleMoves[newRank][newFile] = true;
 		}
 
 		return possibleMoves;

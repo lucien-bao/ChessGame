@@ -20,14 +20,21 @@ class Piece {
 	static final int BLACK_ROOK    = 10;
 	static final int BLACK_QUEEN   = 11;
 	static final int BLACK_KING    = 12;
+	static final int WHITE		   = 1;
+	static final int BLACK		   = 2;
 	
 	// FIELDS
-	boolean isWhite;
+	int teamColor;
 	int type;
 	
 	// CONSTRUCTORS
 	Piece(int type) {
 		this.type = type;
-		this.isWhite = type < 7;
+		if(type == 0)
+			this.teamColor = EMPTY;
+		else if(type < 7)
+			this.teamColor = WHITE;
+		else
+			this.teamColor = BLACK;
 	}
 }

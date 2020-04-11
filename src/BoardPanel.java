@@ -56,7 +56,7 @@ class BoardPanel extends JPanel {
 	 */
 	void movePiece(int startFile, int startRank, int endFile, int endRank) {
 		grid[endRank][endFile] = grid[startRank][startFile];
-		grid[startRank][startFile] = null;
+		grid[startRank][startFile] = new Piece(Piece.EMPTY);
 	}
 	
 	/**
