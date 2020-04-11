@@ -49,26 +49,26 @@ abstract class MoveRules {
 	boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[8][8]; // default value is false
 		boolean isWhite = board[rank][file].isWhite;
-		if(isWhite) { // separation of black and white possible moves is only needed for pawns
+		if(!isWhite) { // separation of black and white possible moves is only needed for pawns
 			if(board[rank + 1][file] == null) { // move one square forward
 				possibleMoves[rank + 1][file] = true;
 				if(rank == 2 && board[rank + 2][file] == null) // move two squares forward
 					possibleMoves[rank + 2][file] = true;
 			}
-			if(file != 1 && board[rank + 1][file - 1] != null && !board[rank + 1][file - 1].isWhite) // capture up and left
+			if(file != 1 && board[rank + 1][file - 1] != null && board[rank + 1][file - 1].isWhite) // capture down and left
 				possibleMoves[rank + 1][file - 1] = true;
-			if(file != 8 && board[rank + 1][file + 1] != null && !board[rank + 1][file + 1].isWhite) // capture up and right
+			if(file != 8 && board[rank + 1][file + 1] != null && board[rank + 1][file + 1].isWhite) // capture down and right
 				possibleMoves[rank + 1][file + 1] = true;
 		}
-		else { // black pawn
+		else { // white pawn
 			if(board[rank - 1][file] == null) { // move one square forward
 				possibleMoves[rank - 1][file] = true;
 				if(rank == 7 && board[rank - 2][file] == null) // move two squares forward
 					possibleMoves[rank - 2][file] = true;
 			}
-			if(file != 1 && board[rank - 1][file - 1] != null && board[rank - 1][file - 1].isWhite) // capture down and left
+			if(file != 1 && board[rank - 1][file - 1] != null && !board[rank - 1][file - 1].isWhite) // capture up and left
 				possibleMoves[rank - 1][file - 1] = true;
-			if(file != 8 && board[rank - 1][file + 1] != null && board[rank - 1][file + 1].isWhite) // capture up and right
+			if(file != 8 && board[rank - 1][file + 1] != null && !board[rank - 1][file + 1].isWhite) // capture up and right
 				possibleMoves[rank - 1][file + 1] = true;
 		}
 		return possibleMoves;

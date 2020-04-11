@@ -31,7 +31,7 @@ class BoardPanel extends JPanel {
 	
 	// CONSTRUCTORS
 	BoardPanel() {
-		grid = new Piece[8][8];
+		grid = new Piece[10][10];
 	}
 	
 	// METHODS
