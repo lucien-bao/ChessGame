@@ -1,15 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.*;
 
 /**
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.7
+ * @version 0.1.8
  * @since 4 APR 2020
  */
-class BoardPanel extends JPanel {
+class BoardPanel extends JPanel implements MouseListener {
 	// CONSTANTS
 	final Color LIGHT_SQUARE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.9f));
 	final Color DARK_SQUARE_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.6f));
@@ -28,7 +30,7 @@ class BoardPanel extends JPanel {
 	// CONSTRUCTORS
 	BoardPanel() {
 		this.setBackground(BACKGROUND_COLOR);
-		
+		addMouseListener(this);
 		grid = new Piece[10][10];
 		// makes all pieces empty squares to start
         for (int rank = 1; rank < 9; rank++) {
@@ -39,6 +41,9 @@ class BoardPanel extends JPanel {
         // TEST OF getPossibleMoves METHOD
         // TODO: remove this
         grid[7][7] = new Piece(Piece.WHITE_PAWN);
+        grid[2][3] = new Piece(Piece.BLACK_KNIGHT);
+        grid[5][4] = new Piece(Piece.WHITE_KNIGHT);
+        grid[2][7] = new Piece(Piece.BLACK_PAWN);
 	}
 	
 	// METHODS
@@ -103,21 +108,49 @@ class BoardPanel extends JPanel {
 	
 	                graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
 			                squareSize, squareSize);
-                	
+
+	                // draw piece
+					graphics2d.setColor(Color.GREEN);
+	                if(grid[rank][file].type != Piece.EMPTY)
+						graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+								squareSize, squareSize);
+
+	                // draw possible moves
+					// TODO: right now, for some reason, this only draws possible moves above the current piece.
+					if(grid[rank][file].showPossibleMoves) {
+						boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
+						graphics2d.setColor(Color.RED);
+						for(int moveRank = 1; moveRank <= 8; moveRank++) {
+							for(int moveFile = 1; moveFile <= 8; moveFile++) {
+								if(possibleMoves[moveRank][moveFile])
+									graphics2d.fillRect(outsideGrid / 2 + squareSize * moveFile,
+											outsideGrid / 2 + squareSize * moveRank, squareSize, squareSize);
+							}
+						}
+					}
                 	// TODO: just test stuff
-                    boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, 7, 7);
-                    if(grid[rank][file].type == Piece.WHITE_PAWN) {
-                        graphics2d.setColor(Color.GREEN);
-                        graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-                                squareSize, squareSize);
-                    }
-                    graphics2d.setColor(Color.RED);
-                    if(possibleMoves[rank][file]) {
-                        graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-                                squareSize, squareSize);
-                    }
                 }
             }
         }
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		int rank = e.getY() / squareSize + outsideGrid / 2;
+		int file = e.getX() / squareSize + outsideGrid / 2;
+		grid[rank][file].showPossibleMoves = !grid[rank][file].showPossibleMoves;
+		repaint();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
 }
