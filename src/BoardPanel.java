@@ -80,6 +80,22 @@ class BoardPanel extends JPanel implements MouseListener {
 		super.paintComponent(graphics);
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		graphics2d.setRenderingHints(RENDERING_HINTS);
+
+		// BACKGROUND
+		// This needs to be a separate for-loop to prevent it drawing over other stuff
+		for(int rank = 0; rank < 10; rank++) {
+			for(int file = 0; file < 10; file++) {
+				// Square background
+				if((file + rank) % 2 == 0)
+					graphics2d.setColor(LIGHT_SQUARE_COLOR);
+				else
+					graphics2d.setColor(DARK_SQUARE_COLOR);
+
+				graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+						squareSize, squareSize);
+			}
+		}
+
         for(int rank = 0; rank < 10; rank++) {
             for(int file = 0; file < 10; file++) {
             	// NUMBER SQUARES
@@ -98,17 +114,8 @@ class BoardPanel extends JPanel implements MouseListener {
                     graphics2d.setColor(Color.MAGENTA);
                     graphics2d.fillOval(x, y, squareSize, squareSize);
                 }
-                // PIECES/EMPTY SQUARES
+                // PIECES/POSSIBLE MOVES
                 else {
-	                // Square background
-	                if((file + rank) % 2 == 0)
-		                graphics2d.setColor(LIGHT_SQUARE_COLOR);
-	                else
-		                graphics2d.setColor(DARK_SQUARE_COLOR);
-	
-	                graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-			                squareSize, squareSize);
-
 	                // draw piece
 					graphics2d.setColor(Color.GREEN);
 	                if(grid[rank][file].type != Piece.EMPTY)
@@ -116,7 +123,6 @@ class BoardPanel extends JPanel implements MouseListener {
 								squareSize, squareSize);
 
 	                // draw possible moves
-					// TODO: right now, for some reason, this only draws possible moves above the current piece.
 					if(grid[rank][file].showPossibleMoves) {
 						boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
 						graphics2d.setColor(Color.RED);
