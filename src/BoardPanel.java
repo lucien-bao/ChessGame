@@ -142,9 +142,16 @@ class BoardPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int rank = e.getY() / squareSize + outsideGrid / 2;
-		int file = e.getX() / squareSize + outsideGrid / 2;
-		grid[rank][file].showPossibleMoves = !grid[rank][file].showPossibleMoves;
+		int pieceRank = e.getY() / squareSize + outsideGrid / 2;
+		int pieceFile = e.getX() / squareSize + outsideGrid / 2;
+		grid[pieceRank][pieceFile].showPossibleMoves = !grid[pieceRank][pieceFile].showPossibleMoves;
+		// set all others to false
+		for(int rank = 1; rank <= 8; rank++) {
+			for(int file = 1; file <= 8; file++) {
+				if(pieceRank != rank || pieceFile != file)
+					grid[rank][file].showPossibleMoves = false;
+			}
+		}
 		repaint();
 	}
 
