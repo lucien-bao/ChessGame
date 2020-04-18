@@ -13,9 +13,13 @@ import java.awt.image.*;
  */
 class BoardPanel extends JPanel implements MouseListener {
 	// CONSTANTS
-	final Color LIGHT_SQUARE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.9f));
-	final Color DARK_SQUARE_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.6f));
-	final Color BACKGROUND_COLOR  = new Color(Color.HSBtoRGB(0, 0, 0.3f));
+	final Color LIGHT_SQUARE_COLOR 	= new Color(Color.HSBtoRGB(0, 0, 0.9f));
+	final Color DARK_SQUARE_COLOR  	= new Color(Color.HSBtoRGB(0, 0, 0.6f));
+	final Color BACKGROUND_COLOR    = new Color(Color.HSBtoRGB(0, 0, 0.3f));
+	final Color POSSIBLE_MOVE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.8f));
+	final int LIGHT_GRAY_OPAQUE		= Color.HSBtoRGB(0, 0, 0.8f);
+	final byte ALPHA				= Byte.parseByte("10000000", 2); // 127, or 10000000 in binary
+
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
@@ -125,12 +129,12 @@ class BoardPanel extends JPanel implements MouseListener {
 	                // draw possible moves
 					if(grid[rank][file].showPossibleMoves) {
 						boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
-						graphics2d.setColor(Color.RED);
+						graphics2d.setColor(POSSIBLE_MOVE_COLOR);
 						for(int moveRank = 1; moveRank <= 8; moveRank++) {
 							for(int moveFile = 1; moveFile <= 8; moveFile++) {
 								if(possibleMoves[moveRank][moveFile])
-									graphics2d.fillRect(outsideGrid / 2 + squareSize * moveFile,
-											outsideGrid / 2 + squareSize * moveRank, squareSize, squareSize);
+									graphics2d.fillOval(outsideGrid / 2 + squareSize * moveFile,
+											outsideGrid / 2 + squareSize * moveRank, squareSize / 2, squareSize / 2);
 							}
 						}
 					}
@@ -138,6 +142,7 @@ class BoardPanel extends JPanel implements MouseListener {
                 }
             }
         }
+        graphics2d.drawImage(Piece.images[1], 0, 0, squareSize, squareSize, this);
 	}
 
 	@Override

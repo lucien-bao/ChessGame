@@ -69,10 +69,10 @@ class Piece {
 	
 	// METHODS
 	static void loadImages(Frame frame) {
+		images = new BufferedImage[13];
 		try {
 			for(int i = 1; i <= 12; i++) {
-				File f = new File("../img/" + i + ".png");
-				System.out.println(f);
+				File f = new File("img/" + i + ".png");
 				images[i] = ImageIO.read(f);
 			}
 		} catch(IOException e) {
