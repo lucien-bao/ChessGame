@@ -1,16 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 
 /**
  * <code>Frame</code> class. This represents the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.8
+ * @version 0.1.9
  * @since 4 APR 2020
  */
-class Frame extends JFrame implements ComponentListener, MouseListener {
+class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 	// CONSTANTS
 	// TODO: make it automatically fullscreen,
 	//  and add a button to toggle fullscreen/not fullscreen
@@ -46,7 +45,7 @@ class Frame extends JFrame implements ComponentListener, MouseListener {
 		
 		// Resizing stuff
 		addComponentListener(this);
-		addMouseListener(this);
+//		addMouseListener(this);
 		
 		// Panel stuff
 		this.setLayout(null);
@@ -185,25 +184,24 @@ class Frame extends JFrame implements ComponentListener, MouseListener {
 	public void componentHidden(ComponentEvent e) {
 	}
 	
-	// MOUSELISTENER METHODS
-	@Override
-	public void mouseClicked(MouseEvent mouseEvent) {
-		System.out.println("Dimensions: " + size.width + ", " + size.height);
-	}
-	
-	@Override
-	public void mousePressed(MouseEvent mouseEvent) {
-	}
-	
-	@Override
-	public void mouseReleased(MouseEvent mouseEvent) {
-	}
-	
-	@Override
-	public void mouseEntered(MouseEvent mouseEvent) {
-	}
-	
-	@Override
-	public void mouseExited(MouseEvent mouseEvent) {
-	}
+//	// MOUSELISTENER METHODS
+//	@Override
+//	public void mouseClicked(MouseEvent mouseEvent) {
+//	}
+//	
+//	@Override
+//	public void mousePressed(MouseEvent mouseEvent) {
+//	}
+//	
+//	@Override
+//	public void mouseReleased(MouseEvent mouseEvent) {
+//	}
+//	
+//	@Override
+//	public void mouseEntered(MouseEvent mouseEvent) {
+//	}
+//	
+//	@Override
+//	public void mouseExited(MouseEvent mouseEvent) {
+//	}
 }

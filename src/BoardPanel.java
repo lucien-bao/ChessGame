@@ -8,7 +8,7 @@ import java.awt.image.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.8
+ * @version 0.1.9
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener {
@@ -17,8 +17,11 @@ class BoardPanel extends JPanel implements MouseListener {
 	final Color DARK_SQUARE_COLOR  	= new Color(Color.HSBtoRGB(0, 0, 0.6f));
 	final Color BACKGROUND_COLOR    = new Color(Color.HSBtoRGB(0, 0, 0.3f));
 	final Color POSSIBLE_MOVE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.8f));
-	final int LIGHT_GRAY_OPAQUE		= Color.HSBtoRGB(0, 0, 0.8f);
-	final byte ALPHA				= Byte.parseByte("10000000", 2); // 127, or 10000000 in binary
+	int LIGHT_GRAY_OPAQUE		= Color.HSBtoRGB(0, 0, 0.8f);
+	int ALPHA				    = Integer.parseInt("10000000", 2);
+	// Take the last 24 bits, then concatenate the ALPHA value at the front
+	int RGBA                  = (LIGHT_GRAY_OPAQUE & 16777215) | (ALPHA << 24);
+	final Color POSS_MOVE_COLOR     = new Color(RGBA, true);
 
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
@@ -95,11 +98,14 @@ class BoardPanel extends JPanel implements MouseListener {
 				else
 					graphics2d.setColor(DARK_SQUARE_COLOR);
 
-				graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
+				graphics2d.fillRect(
+						outsideGrid / 2 + squareSize * file,
+						outsideGrid / 2 + squareSize * rank,
 						squareSize, squareSize);
 			}
 		}
-
+		
+		// NUMBER/LETTER SQUARES
         for(int rank = 0; rank < 10; rank++) {
             for(int file = 0; file < 10; file++) {
             	// NUMBER SQUARES
@@ -118,29 +124,32 @@ class BoardPanel extends JPanel implements MouseListener {
                     graphics2d.setColor(Color.MAGENTA);
                     graphics2d.fillOval(x, y, squareSize, squareSize);
                 }
-                // PIECES/POSSIBLE MOVES
-                else {
-	                // draw piece
-					graphics2d.setColor(Color.GREEN);
-	                if(grid[rank][file].type != Piece.EMPTY)
-						graphics2d.fillRect(outsideGrid / 2 + squareSize * file, outsideGrid / 2 + squareSize * rank,
-								squareSize, squareSize);
-
-	                // draw possible moves
-					if(grid[rank][file].showPossibleMoves) {
-						boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
-						graphics2d.setColor(POSSIBLE_MOVE_COLOR);
-						for(int moveRank = 1; moveRank <= 8; moveRank++) {
-							for(int moveFile = 1; moveFile <= 8; moveFile++) {
-								if(possibleMoves[moveRank][moveFile])
-									graphics2d.fillOval(outsideGrid / 2 + squareSize * moveFile,
-											outsideGrid / 2 + squareSize * moveRank, squareSize / 2, squareSize / 2);
-							}
-						}
-					}
-                	// TODO: just test stuff
-                }
             }
+        }
+        // PIECES/POSSIBLE MOVES
+        for(int rank = 1; rank <= 8; rank++) {
+        	for(int file = 1; file <= 8; file++) {
+		        // PIECE
+		        graphics2d.setColor(Color.GREEN);
+		        if(grid[rank][file].type != Piece.EMPTY)
+			        graphics2d.fillRect(
+			        		outsideGrid / 2 + squareSize * file,
+					        outsideGrid / 2 + squareSize * rank,
+					        squareSize, squareSize);
+		
+		        // POSS MOVES
+		        if(grid[rank][file].showPossibleMoves) {
+			        boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
+			        graphics2d.setColor(POSS_MOVE_COLOR);
+			        for(int moveRank = 1; moveRank <= 8; moveRank++)
+				        for(int moveFile = 1; moveFile <= 8; moveFile++)
+					        if(possibleMoves[moveRank][moveFile])
+						        graphics2d.fillOval(
+						        		outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
+								        outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
+								        squareSize / 2, squareSize / 2);
+		        }
+	        }
         }
         graphics2d.drawImage(Piece.images[1], 0, 0, squareSize, squareSize, this);
 	}
