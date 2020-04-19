@@ -8,7 +8,7 @@ import java.awt.image.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.9
+ * @version 0.1.10
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener {
@@ -53,6 +53,9 @@ class BoardPanel extends JPanel implements MouseListener {
         grid[2][7] = new Piece(Piece.BLACK_PAWN);
         grid[4][5] = new Piece(Piece.BLACK_BISHOP);
         grid[3][6] = new Piece(Piece.WHITE_BISHOP);
+        grid[4][4] = new Piece(Piece.WHITE_ROOK);
+        grid[7][6] = new Piece(Piece.BLACK_QUEEN);
+        grid[5][5] = new Piece(Piece.BLACK_KING);
 	}
 	
 	// METHODS
@@ -132,12 +135,13 @@ class BoardPanel extends JPanel implements MouseListener {
         for(int rank = 1; rank <= 8; rank++) {
         	for(int file = 1; file <= 8; file++) {
 		        // PIECE
-		        graphics2d.setColor(Color.GREEN);
 		        if(grid[rank][file].type != Piece.EMPTY)
-			        graphics2d.fillRect(
+			        graphics2d.drawImage(
+			                Piece.images[grid[rank][file].type],
 			        		outsideGrid / 2 + squareSize * file,
 					        outsideGrid / 2 + squareSize * rank,
-					        squareSize, squareSize);
+					        squareSize, squareSize,
+                            this);
 	        }
         }
 		// POSS MOVES
@@ -156,14 +160,12 @@ class BoardPanel extends JPanel implements MouseListener {
 				}
 			}
 		}
-
-        graphics2d.drawImage(Piece.images[1], 0, 0, squareSize, squareSize, this);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int pieceRank = e.getY() / squareSize + outsideGrid / 2;
-		int pieceFile = e.getX() / squareSize + outsideGrid / 2;
+		int pieceRank = (e.getY() - outsideGrid / 2) / squareSize;
+		int pieceFile = (e.getX() - outsideGrid / 2) / squareSize;
 		grid[pieceRank][pieceFile].showPossibleMoves = !grid[pieceRank][pieceFile].showPossibleMoves;
 		// set all others to false
 		for(int rank = 1; rank <= 8; rank++) {
