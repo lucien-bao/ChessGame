@@ -2,7 +2,7 @@
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if moves are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.3
+ * @version 0.1.4
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -33,8 +33,10 @@ abstract class MoveRules {
 		int pieceType = toMove.type;
 		if(pieceType == Piece.BLACK_PAWN || pieceType == Piece.WHITE_PAWN)
 			possibleMoves = getPawnMoves(board, pieceRank, pieceFile);
-		if(pieceType == Piece.BLACK_KNIGHT || pieceType == Piece.WHITE_KNIGHT)
+		else if(pieceType == Piece.BLACK_KNIGHT || pieceType == Piece.WHITE_KNIGHT)
 			possibleMoves = getKnightMoves(board, pieceRank, pieceFile);
+		else if(pieceType == Piece.BLACK_BISHOP || pieceType == Piece.WHITE_BISHOP)
+			possibleMoves = getBishopMoves(board, pieceRank, pieceFile);
 		// TODO: Call helper methods (which will be written) to determine possible moves.
 		return possibleMoves;
 	}
@@ -99,6 +101,44 @@ abstract class MoveRules {
 				possibleMoves[newRank][newFile] = true;
 		}
 
+		return possibleMoves;
+	}
+
+	/**
+	 * Finds possible moves of a bishop
+	 * @param board the current pieces on the board
+	 * @param rank the rank of the bishop
+	 * @param file the file of the bishop
+	 * @return the possible moves of the bishop
+	 */
+	static boolean[][] getBishopMoves(Piece[][] board, int rank, int file) {
+		boolean[][] possibleMoves = new boolean[10][10];
+
+		int rankTo = rank;
+		int fileTo = file;
+		int bishopColor = board[rank][file].teamColor;
+		int[] xOffsets = new int[] {+1, +1, -1, -1};
+		int[] yOffsets = new int[] {+1, -1, +1, -1};
+		for(int i = 0; i < 4; i++) {
+			rankTo = rank;
+			fileTo = file;
+			while(true) { // up and right
+				rankTo += yOffsets[i];
+				fileTo += xOffsets[i];
+				if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8) {
+					if(board[rankTo][fileTo].teamColor + bishopColor == 3) { // OPPOSITE COLORS
+						possibleMoves[rankTo][fileTo] = true;
+						break;
+					} else if(board[rankTo][fileTo].teamColor == Piece.EMPTY) { // EMPTY SQUARE
+						possibleMoves[rankTo][fileTo] = true;
+					} else { // SAME COLOR
+						break;
+					}
+				} else {
+					break;
+				}
+			}
+		}
 		return possibleMoves;
 	}
 }

@@ -51,6 +51,8 @@ class BoardPanel extends JPanel implements MouseListener {
         grid[2][3] = new Piece(Piece.BLACK_KNIGHT);
         grid[5][4] = new Piece(Piece.WHITE_KNIGHT);
         grid[2][7] = new Piece(Piece.BLACK_PAWN);
+        grid[4][5] = new Piece(Piece.BLACK_BISHOP);
+        grid[3][6] = new Piece(Piece.WHITE_BISHOP);
 	}
 	
 	// METHODS
@@ -126,7 +128,7 @@ class BoardPanel extends JPanel implements MouseListener {
                 }
             }
         }
-        // PIECES/POSSIBLE MOVES
+        // PIECES
         for(int rank = 1; rank <= 8; rank++) {
         	for(int file = 1; file <= 8; file++) {
 		        // PIECE
@@ -136,21 +138,25 @@ class BoardPanel extends JPanel implements MouseListener {
 			        		outsideGrid / 2 + squareSize * file,
 					        outsideGrid / 2 + squareSize * rank,
 					        squareSize, squareSize);
-		
-		        // POSS MOVES
-		        if(grid[rank][file].showPossibleMoves) {
-			        boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
-			        graphics2d.setColor(POSS_MOVE_COLOR);
-			        for(int moveRank = 1; moveRank <= 8; moveRank++)
-				        for(int moveFile = 1; moveFile <= 8; moveFile++)
-					        if(possibleMoves[moveRank][moveFile])
-						        graphics2d.fillOval(
-						        		outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
-								        outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
-								        squareSize / 2, squareSize / 2);
-		        }
 	        }
         }
+		// POSS MOVES
+		for(int rank = 1; rank <= 8; rank++) {
+			for(int file = 1; file <= 8; file++) {
+				if(grid[rank][file].showPossibleMoves) {
+					boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
+					graphics2d.setColor(POSS_MOVE_COLOR);
+					for(int moveRank = 1; moveRank <= 8; moveRank++)
+						for(int moveFile = 1; moveFile <= 8; moveFile++)
+							if(possibleMoves[moveRank][moveFile])
+								graphics2d.fillOval(
+										outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
+										outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
+										squareSize / 2, squareSize / 2);
+				}
+			}
+		}
+
         graphics2d.drawImage(Piece.images[1], 0, 0, squareSize, squareSize, this);
 	}
 
