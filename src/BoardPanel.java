@@ -2,25 +2,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.*;
 
 /**
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.10
+ * @version 0.1.11
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener {
 	// CONSTANTS
 	final Color LIGHT_SQUARE_COLOR 	= new Color(Color.HSBtoRGB(0, 0, 0.9f));
-	final Color DARK_SQUARE_COLOR  	= new Color(Color.HSBtoRGB(0, 0, 0.6f));
+	final Color DARK_SQUARE_COLOR  	= new Color(Color.HSBtoRGB(0, 0, 0.55f));
 	final Color BACKGROUND_COLOR    = new Color(Color.HSBtoRGB(0, 0, 0.3f));
-	final Color POSSIBLE_MOVE_COLOR = new Color(Color.HSBtoRGB(0, 0, 0.8f));
-	int LIGHT_GRAY_OPAQUE		= Color.HSBtoRGB(0, 0, 0.8f);
-	int ALPHA				    = Integer.parseInt("10000000", 2);
+	final int POSS_MOVE_OPAQUE      =           Color.HSBtoRGB(0, 0, 0.7f);
+	final float ALPHA_DESIRED       = 0.8f;
+	final int ALPHA				    = (int) (ALPHA_DESIRED * 255); // Binary form, out of 255
 	// Take the last 24 bits, then concatenate the ALPHA value at the front
-	int RGBA                  = (LIGHT_GRAY_OPAQUE & 16777215) | (ALPHA << 24);
+	final int RGBA                  = (POSS_MOVE_OPAQUE & 16777215) | (ALPHA << 24);
 	final Color POSS_MOVE_COLOR     = new Color(RGBA, true);
 
 	final RenderingHints RENDERING_HINTS = new RenderingHints(

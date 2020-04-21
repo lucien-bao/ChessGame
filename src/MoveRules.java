@@ -2,7 +2,7 @@
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if moves are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.5
+ * @version 0.1.6
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -29,22 +29,25 @@ abstract class MoveRules {
 	 */
 	static boolean[][] getPossibleMoves(Piece[][] board, int pieceRank, int pieceFile) {
 		Piece toMove = board[pieceRank][pieceFile];
-		boolean[][] possibleMoves = new boolean[10][10];
 		int pieceType = toMove.type;
-		if(pieceType == Piece.BLACK_PAWN || pieceType == Piece.WHITE_PAWN)
-			possibleMoves = getPawnMoves(board, pieceRank, pieceFile);
-		else if(pieceType == Piece.BLACK_KNIGHT || pieceType == Piece.WHITE_KNIGHT)
-			possibleMoves = getKnightMoves(board, pieceRank, pieceFile);
-		else if(pieceType == Piece.BLACK_BISHOP || pieceType == Piece.WHITE_BISHOP)
-			possibleMoves = getBishopMoves(board, pieceRank, pieceFile);
-		else if(pieceType == Piece.BLACK_ROOK || pieceType == Piece.WHITE_ROOK)
-		    possibleMoves = getRookMoves(board, pieceRank, pieceFile);
-        else if(pieceType == Piece.BLACK_QUEEN || pieceType == Piece.WHITE_QUEEN)
-            possibleMoves = getQueenMoves(board, pieceRank, pieceFile);
-        else if(pieceType == Piece.BLACK_KING || pieceType == Piece.WHITE_KING)
-            possibleMoves = getKingMoves(board, pieceRank, pieceFile);
-		// TODO: Call helper methods (which will be written) to determine possible moves.
-		return possibleMoves;
+		if(pieceType > 6)
+			pieceType -= 6;
+		switch(pieceType) {
+			case 1:
+				return getPawnMoves(board, pieceRank, pieceFile);
+			case 2:
+				return getKnightMoves(board, pieceRank, pieceFile);
+			case 3:
+				return getBishopMoves(board, pieceRank, pieceFile);
+			case 4:
+				return getRookMoves(board, pieceRank, pieceFile);
+			case 5:
+				return getQueenMoves(board, pieceRank, pieceFile);
+			case 6:
+				return getKingMoves(board, pieceRank, pieceFile);
+			default:
+				return new boolean[10][10];
+		}
 	}
 
 	/**
