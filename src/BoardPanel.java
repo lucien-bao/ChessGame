@@ -45,7 +45,6 @@ class BoardPanel extends JPanel implements MouseListener {
             }
         }
         // TEST OF getPossibleMoves METHOD
-        // TODO: remove this
         grid[7][7] = new Piece(Piece.WHITE_PAWN);
         grid[2][3] = new Piece(Piece.BLACK_KNIGHT);
         grid[5][4] = new Piece(Piece.WHITE_KNIGHT);

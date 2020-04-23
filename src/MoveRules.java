@@ -2,7 +2,7 @@
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if moves are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.6
+ * @version 0.1.7
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -36,9 +36,9 @@ abstract class MoveRules {
 			case 1:
 				return getPawnMoves(board, pieceRank, pieceFile);
 			case 2:
-				return getKnightMoves(board, pieceRank, pieceFile);
-			case 3:
 				return getBishopMoves(board, pieceRank, pieceFile);
+			case 3:
+				return getKnightMoves(board, pieceRank, pieceFile);
 			case 4:
 				return getRookMoves(board, pieceRank, pieceFile);
 			case 5:
@@ -58,32 +58,44 @@ abstract class MoveRules {
 	 * @return the possible moves of the pawn
 	 */
 	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
-		boolean[][] possibleMoves = new boolean[10][10]; // default value is false
+		boolean[][] possibleMoves = new boolean[10][10];
 		int pawnColor = board[rank][file].teamColor;
-		if(pawnColor == Piece.BLACK) { // separation of black and white possible moves is only needed for pawns
-			if(board[rank + 1][file].teamColor == Piece.EMPTY) { // move one square forward
+		// Separate the diff. color pawns b/c they move in opposite directions
+		if(pawnColor == Piece.BLACK) {
+			// Forward movement
+			if(board[rank + 1][file].teamColor == Piece.EMPTY) {
+				// Default 1-square step
 				possibleMoves[rank + 1][file] = true;
-				if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY) // move two squares forward
+				// Starting position 2-step
+				if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY)
 					possibleMoves[rank + 2][file] = true;
 			}
+			// Diag. capture, Southwest
 			if(file != 1 && board[rank + 1][file - 1].teamColor != Piece.EMPTY
-					&& pawnColor != board[rank + 1][file - 1].teamColor) // capture down and left
+					&& pawnColor != board[rank + 1][file - 1].teamColor)
 				possibleMoves[rank + 1][file - 1] = true;
+			// Diag. capture, Southeast
 			if(file != 8 && board[rank + 1][file + 1].teamColor != Piece.EMPTY
-					&& pawnColor != board[rank + 1][file + 1].teamColor) // capture down and right
+					&& pawnColor != board[rank + 1][file + 1].teamColor)
 				possibleMoves[rank + 1][file + 1] = true;
 		}
-		else { // white pawn
-			if(board[rank - 1][file].teamColor == Piece.EMPTY) { // move one square forward
+		// pawnColor == Piece.WHITE
+		else {
+			// Forward movement
+			if(board[rank - 1][file].teamColor == Piece.EMPTY) {
+				// Default 1-square step
 				possibleMoves[rank - 1][file] = true;
-				if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY) // move two squares forward
+				// Starting position 2-step
+				if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY)
 					possibleMoves[rank - 2][file] = true;
 			}
+			// Diag. capture, Northwest
 			if(file != 1 && board[rank - 1][file - 1].teamColor != Piece.EMPTY
-					&& pawnColor != board[rank - 1][file - 1].teamColor) // capture up and left
+					&& pawnColor != board[rank - 1][file - 1].teamColor)
 				possibleMoves[rank - 1][file - 1] = true;
+			// Diag. capture, Northeast
 			if(file != 8 && board[rank - 1][file + 1].teamColor != Piece.EMPTY
-					&& pawnColor != board[rank - 1][file + 1].teamColor) // capture up and right
+					&& pawnColor != board[rank - 1][file + 1].teamColor)
 				possibleMoves[rank - 1][file + 1] = true;
 		}
 		return possibleMoves;
