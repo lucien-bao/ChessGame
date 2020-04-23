@@ -12,15 +12,26 @@ import java.awt.event.MouseListener;
  */
 class BoardPanel extends JPanel implements MouseListener {
 	// CONSTANTS
-	final Color LIGHT_SQUARE_COLOR 	= new Color(Color.HSBtoRGB(0, 0, 0.9f));
-	final Color DARK_SQUARE_COLOR  	= new Color(Color.HSBtoRGB(0, 0, 0.55f));
-	final Color BACKGROUND_COLOR    = new Color(Color.HSBtoRGB(0, 0, 0.3f));
-	final int POSS_MOVE_OPAQUE      =           Color.HSBtoRGB(0, 0, 0.7f);
-	final float ALPHA_DESIRED       = 0.8f;
-	final int ALPHA				    = (int) (ALPHA_DESIRED * 255); // Binary form, out of 255
-	// Take the last 24 bits, then concatenate the ALPHA value at the front
-	final int RGBA                  = (POSS_MOVE_OPAQUE & 16777215) | (ALPHA << 24);
-	final Color POSS_MOVE_COLOR     = new Color(RGBA, true);
+	// How to get RGBA from int:
+	// take the last 24 bits, then concatenate the alpha value at the front,
+	// which is [some color]_ALPHA expressed in binary form out of 255
+	final int LIGHT_SQUARE_OPAQUE   = Color.HSBtoRGB(0, 0, 0.9f);
+	final int DARK_SQUARE_OPAQUE    = Color.HSBtoRGB(0, 0, 0.55f);
+//	final int BACKGROUND_OPAQUE     = Color.HSBtoRGB(0, 0, 0.3f);
+	// Transparency value of the board, so that you can see the background through it
+	float BOARD_ALPHA         = 0.5f;
+	final int LIGHT_SQUARE_RGBA     = (LIGHT_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
+	final int DARK_SQUARE_RGBA      = (DARK_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
+//	final int BACKGROUND_RGBA       = (BACKGROUND_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
+	final Color LIGHT_SQUARE_COLOR 	= new Color(LIGHT_SQUARE_RGBA, true);
+	final Color DARK_SQUARE_COLOR 	= new Color(DARK_SQUARE_RGBA, true);
+//	final Color BACKGROUND_COLOR 	= new Color(BACKGROUND_RGBA, true);
+	final Color BACKGROUND_COLOR    = DARK_SQUARE_COLOR;
+	
+	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.7f);
+	final float POSS_MOVE_ALPHA     = 0.8f;
+	final int POSS_MOVE_RGBA        = (POSS_MOVE_OPAQUE & 16777215) | ((int) (POSS_MOVE_ALPHA*255) << 24);
+	final Color POSS_MOVE_COLOR     = new Color(POSS_MOVE_RGBA, true);
 
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
@@ -35,7 +46,8 @@ class BoardPanel extends JPanel implements MouseListener {
 	
 	// CONSTRUCTORS
 	BoardPanel() {
-		this.setBackground(BACKGROUND_COLOR);
+		// Forces Java to recognize drawing of panels beneath this one (i.e. BackgroundPanel)
+		this.setOpaque(false);
 		addMouseListener(this);
 		grid = new Piece[10][10];
 		// makes all pieces empty squares to start
@@ -92,7 +104,9 @@ class BoardPanel extends JPanel implements MouseListener {
 		graphics2d.setRenderingHints(RENDERING_HINTS);
 
 		// BACKGROUND
-		// This needs to be a separate for-loop to prevent it drawing over other stuff
+		// Draw the background, because setOpaque(false) stops Java from drawing it automatically
+		graphics2d.setColor(BACKGROUND_COLOR);
+		graphics2d.fillRect(0, 0, length, length);
 		for(int rank = 0; rank < 10; rank++) {
 			for(int file = 0; file < 10; file++) {
 				// Square background
@@ -104,7 +118,8 @@ class BoardPanel extends JPanel implements MouseListener {
 				graphics2d.fillRect(
 						outsideGrid / 2 + squareSize * file,
 						outsideGrid / 2 + squareSize * rank,
-						squareSize, squareSize);
+						squareSize, squareSize
+				);
 			}
 		}
 		
@@ -132,17 +147,17 @@ class BoardPanel extends JPanel implements MouseListener {
         // PIECES
         for(int rank = 1; rank <= 8; rank++) {
         	for(int file = 1; file <= 8; file++) {
-		        // PIECE
 		        if(grid[rank][file].type != Piece.EMPTY)
 			        graphics2d.drawImage(
 			                Piece.images[grid[rank][file].type],
 			        		outsideGrid / 2 + squareSize * file,
 					        outsideGrid / 2 + squareSize * rank,
 					        squareSize, squareSize,
-                            this);
+                            this
+			        );
 	        }
         }
-		// POSS MOVES
+		// POSS. MOVES
 		for(int rank = 1; rank <= 8; rank++) {
 			for(int file = 1; file <= 8; file++) {
 				if(grid[rank][file].showPossibleMoves) {
@@ -154,7 +169,8 @@ class BoardPanel extends JPanel implements MouseListener {
 								graphics2d.fillOval(
 										outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
 										outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
-										squareSize / 2, squareSize / 2);
+										squareSize / 2, squareSize / 2
+								);
 				}
 			}
 		}
@@ -164,8 +180,9 @@ class BoardPanel extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		int pieceRank = (e.getY() - outsideGrid / 2) / squareSize;
 		int pieceFile = (e.getX() - outsideGrid / 2) / squareSize;
+		// Clicking on a square toggles selection
 		grid[pieceRank][pieceFile].showPossibleMoves = !grid[pieceRank][pieceFile].showPossibleMoves;
-		// set all others to false
+		// Set all others to false
 		for(int rank = 1; rank <= 8; rank++) {
 			for(int file = 1; file <= 8; file++) {
 				if(pieceRank != rank || pieceFile != file)

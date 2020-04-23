@@ -1,12 +1,15 @@
+import javax.imageio.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
 
 /**
  * <code>Frame</code> class. This represents the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.9
+ * @version 0.1.10
  * @since 4 APR 2020
  */
 class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
@@ -31,16 +34,17 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 	BoardPanel boardPanel; // Chessboard panel
 	PlayerPanel blackPanel; // Black player info panel
 	PlayerPanel whitePanel; // White player info panel
+	BackgroundPanel backgroundPanel; // Panel that displays background image
 	
 	// CONSTRUCTOR
 	
 	/**
 	 * Constructor. Initiates all the <code>JPanels</code>.
 	 */
-	Frame() {
+	public Frame() {
 		super("JChess");
 		
-		// Images
+		// Piece images
 		Piece.loadImages(this);
 		
 		// Resizing stuff
@@ -59,15 +63,19 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		boardPanel.setBounds(150, 0, 500, 500);
 		this.add(boardPanel);
 		
-		blackPanel = new PlayerPanel();
+		blackPanel = new PlayerPanel(false);
 		blackPanel.setBackground(Color.BLACK);
 		blackPanel.setBounds(650, 0, 150, 250);
 		this.add(blackPanel);
 		
-		whitePanel = new PlayerPanel();
+		whitePanel = new PlayerPanel(true);
 		whitePanel.setBackground(Color.WHITE);
 		whitePanel.setBounds(650, 250, 150, 250);
 		this.add(whitePanel);
+		
+		backgroundPanel = new BackgroundPanel();
+		backgroundPanel.setBounds(0, 0, 800, 500);
+		this.add(backgroundPanel);
 		
 		// Misc. setup
 		this.setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT + MENU_BAR_HEIGHT));
@@ -89,6 +97,9 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
         int effectiveHeight = size.height;
 		int horShift = 0;
 		int verShift = 0;
+		
+		backgroundPanel.changeSize(width, height);
+		backgroundPanel.setBounds(0, 0, width, height);
 		
         // Portrait orientation
 		if(effectiveWidth <= effectiveHeight) {
@@ -155,7 +166,12 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 			whitePanel.setBounds(sidePanelLength + effectiveHeight + horShift, playerPanelHeight + verShift,
 					sidePanelLength, playerPanelHeight);
 		}
-		boardPanel.repaint(); // redraws everything
+		// Redraw everything
+		backgroundPanel.repaint();
+		boardPanel.repaint();
+		whitePanel.repaint();
+		blackPanel.repaint();
+		infoPanel.repaint();
 	}
 	
 	// COMPONENTLISTER METHODS

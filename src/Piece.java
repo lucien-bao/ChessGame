@@ -1,5 +1,4 @@
 import javax.imageio.*;
-import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 
@@ -7,7 +6,7 @@ import java.io.*;
  * <code>Piece</code> class. Types of pieces and their possible moves.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.5
+ * @version 0.1.7
  * @since 4 APR 2020
  */
 class Piece {
@@ -70,13 +69,14 @@ class Piece {
 	// METHODS
 	static void loadImages(Frame frame) {
 		images = new BufferedImage[13];
+		int i = 1;
 		try {
-			for(int i = 1; i <= 12; i++) {
+			for(; i <= 12; i++) {
 				File f = new File("img/" + i + ".png");
 				images[i] = ImageIO.read(f);
 			}
 		} catch(IOException e) {
-			System.out.println("Something went wrong.");
+			System.out.println("Image number " + i + " could not be loaded.");
 			e.printStackTrace();
 		}
 	}
