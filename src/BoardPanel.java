@@ -28,8 +28,8 @@ class BoardPanel extends JPanel implements MouseListener {
 //	final Color BACKGROUND_COLOR 	= new Color(BACKGROUND_RGBA, true);
 	final Color BACKGROUND_COLOR    = DARK_SQUARE_COLOR;
 	
-	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.7f);
-	final float POSS_MOVE_ALPHA     = 0.8f;
+	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.6f);
+	final float POSS_MOVE_ALPHA     = 0.9f;
 	final int POSS_MOVE_RGBA        = (POSS_MOVE_OPAQUE & 16777215) | ((int) (POSS_MOVE_ALPHA*255) << 24);
 	final Color POSS_MOVE_COLOR     = new Color(POSS_MOVE_RGBA, true);
 
