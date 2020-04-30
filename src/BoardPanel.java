@@ -2,12 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayDeque;
 
 /**
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.11
+ * @version 0.1.12
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener {
@@ -43,6 +44,10 @@ class BoardPanel extends JPanel implements MouseListener {
 	int length; // JPanel dimensions. Represents both because it's a square.
 	int squareSize;
 	int outsideGrid; // Amount of excess length outside the drawn grid (due to int truncation).
+	int selectedPieceRank;
+	int selectedPieceFile;
+
+	ArrayDeque<Move> moves = new ArrayDeque<Move>();
 	
 	// CONSTRUCTORS
 	BoardPanel() {
@@ -51,9 +56,15 @@ class BoardPanel extends JPanel implements MouseListener {
 		addMouseListener(this);
 		grid = new Piece[10][10];
 		// makes all pieces empty squares to start
-        for (int rank = 1; rank < 9; rank++) {
-            for (int file = 1; file < 9; file++) {
+		// sets edge pieces to labels
+        for(int rank = 0; rank <= 9; rank++) {
+            for(int file = 0; file <= 9; file++) {
                 grid[rank][file] = new Piece(Piece.EMPTY);
+                if((file == 0 || file == 9) && rank > 0 && rank < 9) {
+					grid[rank][file] = new Piece(Piece.LABEL_ONE + rank - 1);
+				} else if((rank == 0 || rank == 9) && file > 0 && file < 9) {
+					grid[rank][file] = new Piece(Piece.LABEL_A + file - 1);
+				}
             }
         }
         // TEST OF getPossibleMoves METHOD
@@ -66,6 +77,9 @@ class BoardPanel extends JPanel implements MouseListener {
         grid[4][4] = new Piece(Piece.WHITE_ROOK);
         grid[7][6] = new Piece(Piece.BLACK_QUEEN);
         grid[5][5] = new Piece(Piece.BLACK_KING);
+
+        selectedPieceRank = 5;
+        selectedPieceFile = 1;
 	}
 	
 	// METHODS
@@ -89,6 +103,7 @@ class BoardPanel extends JPanel implements MouseListener {
 	 * @param endRank   the new rank of the piece
 	 */
 	void movePiece(int startFile, int startRank, int endFile, int endRank) {
+		moves.add(new Move(grid[startRank][startFile], grid[endRank][endFile], startFile, startRank, endFile, endRank));
 		grid[endRank][endFile] = grid[startRank][startFile];
 		grid[startRank][startFile] = new Piece(Piece.EMPTY);
 	}
@@ -158,36 +173,39 @@ class BoardPanel extends JPanel implements MouseListener {
 	        }
         }
 		// POSS. MOVES
-		for(int rank = 1; rank <= 8; rank++) {
-			for(int file = 1; file <= 8; file++) {
-				if(grid[rank][file].showPossibleMoves) {
-					boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, rank, file);
-					graphics2d.setColor(POSS_MOVE_COLOR);
-					for(int moveRank = 1; moveRank <= 8; moveRank++)
-						for(int moveFile = 1; moveFile <= 8; moveFile++)
-							if(possibleMoves[moveRank][moveFile])
-								graphics2d.fillOval(
-										outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
-										outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
-										squareSize / 2, squareSize / 2
-								);
-				}
-			}
+		boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, selectedPieceRank, selectedPieceFile);
+		graphics2d.setColor(POSS_MOVE_COLOR);
+		for(int moveRank = 1; moveRank <= 8; moveRank++)
+			for(int moveFile = 1; moveFile <= 8; moveFile++)
+				if(possibleMoves[moveRank][moveFile])
+					graphics2d.fillOval(
+							outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
+							outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
+							squareSize / 2, squareSize / 2
+					);
 		}
-	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int pieceRank = (e.getY() - outsideGrid / 2) / squareSize;
-		int pieceFile = (e.getX() - outsideGrid / 2) / squareSize;
-		// Clicking on a square toggles selection
-		grid[pieceRank][pieceFile].showPossibleMoves = !grid[pieceRank][pieceFile].showPossibleMoves;
-		// Set all others to false
-		for(int rank = 1; rank <= 8; rank++) {
-			for(int file = 1; file <= 8; file++) {
-				if(pieceRank != rank || pieceFile != file)
-					grid[rank][file].showPossibleMoves = false;
+		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
+		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
+
+		// attempt to move piece
+		if(selectedPieceFile != 0 && selectedPieceRank != 0) {
+			boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, selectedPieceRank, selectedPieceFile);
+			if(possibleMoves[clickedRank][clickedFile]) {
+				movePiece(selectedPieceFile, selectedPieceRank, clickedFile, clickedRank);
 			}
+			selectedPieceFile = 0;
+			selectedPieceRank = 0;
+		}
+
+		else if(clickedRank == selectedPieceRank && clickedFile == selectedPieceFile) {
+			selectedPieceFile = 0;
+			selectedPieceRank = 0;
+		} else {
+			selectedPieceFile = clickedFile;
+			selectedPieceRank = clickedRank;
 		}
 		repaint();
 	}

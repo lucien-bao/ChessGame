@@ -52,12 +52,10 @@ class Piece {
 	// FIELDS
 	int teamColor;
 	int type;
-	boolean showPossibleMoves; // when clicked, a piece's possible moves will be highlighted
 	
 	// CONSTRUCTORS
 	Piece(int type) {
 		this.type = type;
-		this.showPossibleMoves = false;
 		if(type == 0)
 			this.teamColor = EMPTY;
 		else if(type < 7)
