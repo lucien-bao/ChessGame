@@ -8,28 +8,26 @@ import java.util.ArrayDeque;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.12
+ * @version 0.1.13
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener {
 	// CONSTANTS
+	
 	// How to get RGBA from int:
 	// take the last 24 bits, then concatenate the alpha value at the front,
 	// which is [some color]_ALPHA expressed in binary form out of 255
 	final int LIGHT_SQUARE_OPAQUE   = Color.HSBtoRGB(0, 0, 0.9f);
-	final int DARK_SQUARE_OPAQUE    = Color.HSBtoRGB(0, 0, 0.55f);
-//	final int BACKGROUND_OPAQUE     = Color.HSBtoRGB(0, 0, 0.3f);
+	final int DARK_SQUARE_OPAQUE    = Color.HSBtoRGB(0, 0, 0.4f);
 	// Transparency value of the board, so that you can see the background through it
-	float BOARD_ALPHA         = 0.5f;
+	float BOARD_ALPHA               = 0.5f;
 	final int LIGHT_SQUARE_RGBA     = (LIGHT_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
 	final int DARK_SQUARE_RGBA      = (DARK_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
-//	final int BACKGROUND_RGBA       = (BACKGROUND_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
 	final Color LIGHT_SQUARE_COLOR 	= new Color(LIGHT_SQUARE_RGBA, true);
 	final Color DARK_SQUARE_COLOR 	= new Color(DARK_SQUARE_RGBA, true);
-//	final Color BACKGROUND_COLOR 	= new Color(BACKGROUND_RGBA, true);
 	final Color BACKGROUND_COLOR    = DARK_SQUARE_COLOR;
 	
-	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.6f);
+	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.7f);
 	final float POSS_MOVE_ALPHA     = 0.9f;
 	final int POSS_MOVE_RGBA        = (POSS_MOVE_OPAQUE & 16777215) | ((int) (POSS_MOVE_ALPHA*255) << 24);
 	final Color POSS_MOVE_COLOR     = new Color(POSS_MOVE_RGBA, true);
@@ -187,10 +185,11 @@ class BoardPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// TODO: clicking on a different piece should pull up possible moves for it, not deselect
 		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
-		// attempt to move piece
+		// Attempt to move piece
 		if(selectedPieceFile != 0 && selectedPieceRank != 0) {
 			boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, selectedPieceRank, selectedPieceFile);
 			if(possibleMoves[clickedRank][clickedFile]) {
