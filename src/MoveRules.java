@@ -1,8 +1,8 @@
 /**
- * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if moves are valid.
+ * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.7
+ * @version 0.1.9
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -20,14 +20,14 @@ abstract class MoveRules {
 	- Promotion
 	 */
 	/**
-	 * Gets possible moves of a specific piece
+	 * Gets possible doneMoveStack of a specific piece
 	 * Calls a specific helper method based on the piece type
 	 * @param board the current pieces on the board
 	 * @param pieceRank the rank of the piece to move
 	 * @param pieceFile the file of the piece to move
-	 * @return the possible moves of the piece
+	 * @return the possible doneMoveStack of the piece
 	 */
-	static boolean[][] getPossibleMoves(Piece[][] board, int pieceRank, int pieceFile) {
+	static boolean[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile) {
 		Piece toMove = board[pieceRank][pieceFile];
 		int pieceType = toMove.type;
 		if(pieceType > 6)
@@ -51,11 +51,11 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible moves of a pawn
+	 * Finds possible doneMoveStack of a pawn
 	 * @param board the current pieces on the board
 	 * @param rank the rank of the pawn
 	 * @param file the file of the pawn
-	 * @return the possible moves of the pawn
+	 * @return the possible doneMoveStack of the pawn
 	 */
 	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[10][10];
@@ -102,11 +102,11 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible moves of a knight
+	 * Finds possible doneMoveStack of a knight
 	 * @param board the current pieces on the board
 	 * @param rank the rank of the knight
 	 * @param file the file of the knight
-	 * @return the possible moves of the knight
+	 * @return the possible doneMoveStack of the knight
 	 */
 	static boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[10][10];
@@ -126,11 +126,11 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible moves of a bishop
+	 * Finds possible doneMoveStack of a bishop
 	 * @param board the current pieces on the board
 	 * @param rank the rank of the bishop
 	 * @param file the file of the bishop
-	 * @return the possible moves of the bishop
+	 * @return the possible doneMoveStack of the bishop
 	 */
 	static boolean[][] getBishopMoves(Piece[][] board, int rank, int file) {
 		boolean[][] possibleMoves = new boolean[10][10];
@@ -164,11 +164,11 @@ abstract class MoveRules {
 	}
 
     /**
-     * Finds possible moves of a rook
+     * Finds possible doneMoveStack of a rook
      * @param board the current pieces on the board
      * @param rank the rank of the rook
      * @param file the file of the rook
-     * @return the possible moves of the rook
+     * @return the possible doneMoveStack of the rook
      */
     static boolean[][] getRookMoves(Piece[][] board, int rank, int file) {
         boolean[][] possibleMoves = new boolean[10][10];
@@ -202,11 +202,11 @@ abstract class MoveRules {
     }
 
     /**
-     * Finds possible moves of a queen
+     * Finds possible doneMoveStack of a queen
      * @param board the current pieces on the board
      * @param rank the rank of the queen
      * @param file the file of the queen
-     * @return the possible moves of the queen
+     * @return the possible doneMoveStack of the queen
      */
     static boolean[][] getQueenMoves(Piece[][] board, int rank, int file) {
         boolean[][] possibleMoves = new boolean[10][10];
@@ -222,11 +222,11 @@ abstract class MoveRules {
     }
 
     /**
-     * Finds possible moves of a king
+     * Finds possible doneMoveStack of a king
      * @param board the current pieces on the board
      * @param rank the rank of the king
      * @param file the file of the king
-     * @return the possible moves of the king
+     * @return the possible doneMoveStack of the king
      */
     static boolean[][] getKingMoves(Piece[][] board, int rank, int file) {
         boolean[][] possibleMoves = new boolean[10][10];

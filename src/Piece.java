@@ -3,7 +3,7 @@ import java.awt.image.*;
 import java.io.*;
 
 /**
- * <code>Piece</code> class. Types of pieces and their possible moves.
+ * <code>Piece</code> class. Types of pieces and their possible doneMoveStack.
  *
  * @author Chris W. Bao, Ben C. Megan
  * @version 0.1.7

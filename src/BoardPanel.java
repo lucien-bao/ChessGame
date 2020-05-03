@@ -1,17 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayDeque;
 
 /**
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.13
+ * @version 0.1.14
  * @since 4 APR 2020
  */
-class BoardPanel extends JPanel implements MouseListener {
+class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	// CONSTANTS
 	
 	// How to get RGBA from int:
@@ -42,10 +41,12 @@ class BoardPanel extends JPanel implements MouseListener {
 	int length; // JPanel dimensions. Represents both because it's a square.
 	int squareSize;
 	int outsideGrid; // Amount of excess length outside the drawn grid (due to int truncation).
-	int selectedPieceRank;
-	int selectedPieceFile;
+	int selectedRank;
+	int selectedFile;
+	boolean whiteToMove;
 
-	ArrayDeque<Move> moves = new ArrayDeque<Move>();
+	ArrayDeque<State> doneMoveStack;
+	ArrayDeque<State> undoneMoveStack;
 	
 	// CONSTRUCTORS
 	BoardPanel() {
@@ -76,8 +77,13 @@ class BoardPanel extends JPanel implements MouseListener {
         grid[7][6] = new Piece(Piece.BLACK_QUEEN);
         grid[5][5] = new Piece(Piece.BLACK_KING);
 
-        selectedPieceRank = 5;
-        selectedPieceFile = 1;
+        selectedRank = 0;
+        selectedFile = 0;
+        
+        whiteToMove = true;
+        
+        doneMoveStack = new ArrayDeque<>();
+        undoneMoveStack = new ArrayDeque<>();
 	}
 	
 	// METHODS
@@ -100,10 +106,32 @@ class BoardPanel extends JPanel implements MouseListener {
 	 * @param endFile   the new file of the piece
 	 * @param endRank   the new rank of the piece
 	 */
-	void movePiece(int startFile, int startRank, int endFile, int endRank) {
-		moves.add(new Move(grid[startRank][startFile], grid[endRank][endFile], startFile, startRank, endFile, endRank));
+	void doMove(int startRank, int startFile, int endRank, int endFile) {
+		doneMoveStack.add(new State(grid));
+		undoneMoveStack.clear();
 		grid[endRank][endFile] = grid[startRank][startFile];
 		grid[startRank][startFile] = new Piece(Piece.EMPTY);
+		whiteToMove = !whiteToMove;
+	}
+	
+	/**
+	 * Undoes a move.
+	 */
+	void undoMove() {
+		State lastBoardState = doneMoveStack.pop();
+		grid = lastBoardState.getBoard();
+		whiteToMove = !whiteToMove;
+		undoneMoveStack.add(lastBoardState);
+	}
+	
+	/**
+	 * Redoes a move.
+	 */
+	void redoMove() {
+		State lastBoardState = undoneMoveStack.pop();
+		grid = lastBoardState.getBoard();
+		whiteToMove = !whiteToMove;
+		doneMoveStack.add(lastBoardState);
 	}
 	
 	/**
@@ -171,7 +199,7 @@ class BoardPanel extends JPanel implements MouseListener {
 	        }
         }
 		// POSS. MOVES
-		boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, selectedPieceRank, selectedPieceFile);
+		boolean[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile);
 		graphics2d.setColor(POSS_MOVE_COLOR);
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
@@ -181,30 +209,45 @@ class BoardPanel extends JPanel implements MouseListener {
 							outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
 							squareSize / 2, squareSize / 2
 					);
-		}
-
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO: clicking on a different piece should pull up possible moves for it, not deselect
+		/*
+		NOTE: default value is (0, 0) --> if selected coords equals it, then ignore that selection
+		When a piece is selected:
+		  If click on valid move, perform that move
+		  (Else) If click on valid friendly piece, select that piece
+		  Else (Click is on non-valid square), deselect
+		When a piece is NOT selected:
+		  If click on valid friendly piece, select that piece
+		*/
+		
 		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
-		// Attempt to move piece
-		if(selectedPieceFile != 0 && selectedPieceRank != 0) {
-			boolean[][] possibleMoves = MoveRules.getPossibleMoves(grid, selectedPieceRank, selectedPieceFile);
-			if(possibleMoves[clickedRank][clickedFile]) {
-				movePiece(selectedPieceFile, selectedPieceRank, clickedFile, clickedRank);
+		if(selectedFile != 0) {     // PIECE IS SELECTED
+			boolean[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile);
+			if(possMoves[clickedRank][clickedFile]) {               // PERFORM VALID MOVE
+				doMove(selectedRank, selectedFile, clickedRank, clickedFile);
+				selectedRank = 0;
+				selectedFile = 0;
+			} else if(grid[selectedRank][selectedFile].teamColor ==
+					grid[clickedRank][clickedFile].teamColor) {     // SWITCH SELECTED PIECE
+				selectedRank = clickedRank;
+				selectedFile = clickedFile;
+			} else {                                                // DESELECT PIECE
+				selectedRank = 0;
+				selectedFile = 0;
 			}
-			selectedPieceFile = 0;
-			selectedPieceRank = 0;
-		}
-
-		else if(clickedRank == selectedPieceRank && clickedFile == selectedPieceFile) {
-			selectedPieceFile = 0;
-			selectedPieceRank = 0;
-		} else {
-			selectedPieceFile = clickedFile;
-			selectedPieceRank = clickedRank;
+		} else {                    // NOTHING SELECTED
+			if(whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.WHITE) {
+				selectedRank = clickedRank;
+				selectedFile = clickedFile;
+			} else if(!whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.BLACK) {
+				selectedRank = clickedRank;
+				selectedFile = clickedFile;
+			}
 		}
 		repaint();
 	}
@@ -220,4 +263,12 @@ class BoardPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {}
+	
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent e) {}
 }

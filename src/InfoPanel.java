@@ -25,7 +25,6 @@ public class InfoPanel extends JPanel {
 	// CONSTRUCTOR
 	InfoPanel() {
 		this.setOpaque(false);
-		System.out.println(BACKGROUND_COLOR.getAlpha());
 	}
 	
 	// METHODS
