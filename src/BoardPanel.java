@@ -70,7 +70,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         grid[7][7] = new Piece(Piece.WHITE_PAWN);
         grid[2][3] = new Piece(Piece.BLACK_KNIGHT);
         grid[5][4] = new Piece(Piece.WHITE_KNIGHT);
-        grid[2][7] = new Piece(Piece.BLACK_PAWN);
+        grid[2][8] = new Piece(Piece.BLACK_PAWN);
         grid[4][5] = new Piece(Piece.BLACK_BISHOP);
         grid[3][6] = new Piece(Piece.WHITE_BISHOP);
         grid[4][4] = new Piece(Piece.WHITE_ROOK);
@@ -82,8 +82,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         
         whiteToMove = true;
         
-        doneMoveStack = new ArrayDeque<>();
-        undoneMoveStack = new ArrayDeque<>();
+        doneMoveStack = new ArrayDeque<State>();
+        undoneMoveStack = new ArrayDeque<State>();
 	}
 	
 	// METHODS
@@ -199,7 +199,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	        }
         }
 		// POSS. MOVES
-		boolean[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile);
+		boolean[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
 		graphics2d.setColor(POSS_MOVE_COLOR);
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
@@ -227,7 +227,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
 		if(selectedFile != 0) {     // PIECE IS SELECTED
-			boolean[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile);
+			boolean[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
 			if(possMoves[clickedRank][clickedFile]) {               // PERFORM VALID MOVE
 				doMove(selectedRank, selectedFile, clickedRank, clickedFile);
 				selectedRank = 0;

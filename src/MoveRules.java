@@ -1,8 +1,10 @@
+import java.util.ArrayDeque;
+
 /**
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.9
+ * @version 0.1.10
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -27,14 +29,14 @@ abstract class MoveRules {
 	 * @param pieceFile the file of the piece to move
 	 * @return the possible doneMoveStack of the piece
 	 */
-	static boolean[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile) {
+	static boolean[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile, ArrayDeque<State> doneMoveStack) {
 		Piece toMove = board[pieceRank][pieceFile];
 		int pieceType = toMove.type;
 		if(pieceType > 6)
 			pieceType -= 6;
 		switch(pieceType) {
 			case 1:
-				return getPawnMoves(board, pieceRank, pieceFile);
+				return getPawnMoves(board, pieceRank, pieceFile, doneMoveStack);
 			case 2:
 				return getBishopMoves(board, pieceRank, pieceFile);
 			case 3:
@@ -57,7 +59,7 @@ abstract class MoveRules {
 	 * @param file the file of the pawn
 	 * @return the possible doneMoveStack of the pawn
 	 */
-	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file) {
+	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack) {
 		boolean[][] possibleMoves = new boolean[10][10];
 		int pawnColor = board[rank][file].teamColor;
 		// Separate the diff. color pawns b/c they move in opposite directions
@@ -78,6 +80,42 @@ abstract class MoveRules {
 			if(file != 8 && board[rank + 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file + 1].teamColor)
 				possibleMoves[rank + 1][file + 1] = true;
+
+			// En passant
+			if(rank == 5) {
+				if( // Capture down and left
+						file != 1 &&
+						board[rank][file - 1].type == Piece.WHITE_PAWN &&
+						board[rank + 2][file - 1].type == Piece.EMPTY &&
+						board[rank + 1][file - 1].type == Piece.EMPTY &&
+						doneMoveStack.peekLast().getBoard()[rank + 2][file - 1].type == Piece.WHITE_PAWN
+				) {
+					System.out.println("yay");
+					possibleMoves[rank + 1][file - 1] = true;
+				}
+				else {
+					// TODO: All elements of doneMoveStack are the same. Idk why
+					while(doneMoveStack.peekLast() != null) {
+						for(int rank2 = 1; rank2 <= 8; rank2++) {
+							for(int file2 = 1; file2 <= 8; file2++) {
+								System.out.print(doneMoveStack.peekLast().getBoard()[rank2][file2].type + " ");
+							}
+							System.out.println();
+						}
+						System.out.println();
+						doneMoveStack.pop();
+					}
+				}
+				if( // Capture down and right
+						file != 8 &&
+						board[rank][file + 1].type == Piece.WHITE_PAWN &&
+						board[rank + 2][file + 1].type == Piece.EMPTY &&
+						board[rank + 1][file + 1].type == Piece.EMPTY &&
+						doneMoveStack.peekLast().getBoard()[rank + 2][file + 1].type == Piece.WHITE_PAWN
+				) {
+					possibleMoves[rank + 1][file + 1] = true;
+				}
+			}
 		}
 		// pawnColor == Piece.WHITE
 		else {
@@ -97,6 +135,28 @@ abstract class MoveRules {
 			if(file != 8 && board[rank - 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file + 1].teamColor)
 				possibleMoves[rank - 1][file + 1] = true;
+
+			// En passant
+			if(rank == 4) {
+				if( // Capture up and left
+						file != 1 &&
+								board[rank][file - 1].type == Piece.BLACK_PAWN &&
+								board[rank - 2][file - 1].type == Piece.EMPTY &&
+								board[rank - 1][file - 1].type == Piece.EMPTY &&
+								doneMoveStack.peekLast().getBoard()[rank - 2][file - 1].type == Piece.BLACK_PAWN
+				) {
+					possibleMoves[rank - 1][file - 1] = true;
+				}
+				if( // Capture down and right
+						file != 8 &&
+								board[rank][file + 1].type == Piece.BLACK_PAWN &&
+								board[rank - 2][file + 1].type == Piece.EMPTY &&
+								board[rank - 1][file + 1].type == Piece.EMPTY &&
+								doneMoveStack.peekLast().getBoard()[rank - 2][file + 1].type == Piece.BLACK_PAWN
+				) {
+					possibleMoves[rank - 1][file + 1] = true;
+				}
+			}
 		}
 		return possibleMoves;
 	}
