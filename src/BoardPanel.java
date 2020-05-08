@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.14
+ * @version 0.1.15
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -82,8 +82,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         
         whiteToMove = true;
         
-        doneMoveStack = new ArrayDeque<State>();
-        undoneMoveStack = new ArrayDeque<State>();
+        doneMoveStack = new ArrayDeque<>();
+        undoneMoveStack = new ArrayDeque<>();
 	}
 	
 	// METHODS
@@ -106,11 +106,21 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * @param endFile   the new file of the piece
 	 * @param endRank   the new rank of the piece
 	 */
-	void doMove(int startRank, int startFile, int endRank, int endFile) {
-		doneMoveStack.add(new State(grid));
+	void doMove(int startRank, int startFile, int endRank, int endFile, int moveType) {
+		Piece[][] gridCopy = new Piece[10][10];
+		for(int i = 0; i < 10; i++)
+			System.arraycopy(grid[i], 0, gridCopy[i], 0, 10);
+		doneMoveStack.push(new State(gridCopy));
 		undoneMoveStack.clear();
 		grid[endRank][endFile] = grid[startRank][startFile];
 		grid[startRank][startFile] = new Piece(Piece.EMPTY);
+		if(moveType == 2) {
+			if(grid[endRank][endFile].teamColor == Piece.WHITE) {   // WHITE EN PASSANT
+				grid[endRank+1][endFile] = new Piece(Piece.EMPTY);
+			} else {                                                // BLACK EN PASSANT
+				grid[endRank-1][endFile] = new Piece(Piece.EMPTY);
+			}
+		}
 		whiteToMove = !whiteToMove;
 	}
 	
@@ -121,7 +131,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		State lastBoardState = doneMoveStack.pop();
 		grid = lastBoardState.getBoard();
 		whiteToMove = !whiteToMove;
-		undoneMoveStack.add(lastBoardState);
+		undoneMoveStack.push(lastBoardState);
 	}
 	
 	/**
@@ -131,7 +141,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		State lastBoardState = undoneMoveStack.pop();
 		grid = lastBoardState.getBoard();
 		whiteToMove = !whiteToMove;
-		doneMoveStack.add(lastBoardState);
+		doneMoveStack.push(lastBoardState);
 	}
 	
 	/**
@@ -199,16 +209,15 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	        }
         }
 		// POSS. MOVES
-		boolean[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
+		int[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
 		graphics2d.setColor(POSS_MOVE_COLOR);
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
-				if(possibleMoves[moveRank][moveFile])
+				if(possibleMoves[moveRank][moveFile] != 0)
 					graphics2d.fillOval(
 							outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
 							outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
-							squareSize / 2, squareSize / 2
-					);
+							squareSize / 2, squareSize / 2);
 	}
 	
 	@Override
@@ -227,9 +236,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
 		if(selectedFile != 0) {     // PIECE IS SELECTED
-			boolean[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
-			if(possMoves[clickedRank][clickedFile]) {               // PERFORM VALID MOVE
-				doMove(selectedRank, selectedFile, clickedRank, clickedFile);
+			int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
+			int moveType = possMoves[clickedRank][clickedFile];
+			if(moveType != 0) {          // PERFORM VALID MOVE
+				doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
 				selectedRank = 0;
 				selectedFile = 0;
 			} else if(grid[selectedRank][selectedFile].teamColor ==

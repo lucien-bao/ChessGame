@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.10
+ * @version 0.1.11
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -29,7 +29,7 @@ abstract class MoveRules {
 	 * @param pieceFile the file of the piece to move
 	 * @return the possible doneMoveStack of the piece
 	 */
-	static boolean[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile, ArrayDeque<State> doneMoveStack) {
+	static int[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile, ArrayDeque<State> doneMoveStack) {
 		Piece toMove = board[pieceRank][pieceFile];
 		int pieceType = toMove.type;
 		if(pieceType > 6)
@@ -48,7 +48,7 @@ abstract class MoveRules {
 			case 6:
 				return getKingMoves(board, pieceRank, pieceFile);
 			default:
-				return new boolean[10][10];
+				return new int[10][10];
 		}
 	}
 
@@ -59,61 +59,49 @@ abstract class MoveRules {
 	 * @param file the file of the pawn
 	 * @return the possible doneMoveStack of the pawn
 	 */
-	static boolean[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack) {
-		boolean[][] possibleMoves = new boolean[10][10];
+	static int[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack) {
+		int[][] possibleMoves = new int[10][10];
 		int pawnColor = board[rank][file].teamColor;
 		// Separate the diff. color pawns b/c they move in opposite directions
 		if(pawnColor == Piece.BLACK) {
 			// Forward movement
 			if(board[rank + 1][file].teamColor == Piece.EMPTY) {
 				// Default 1-square step
-				possibleMoves[rank + 1][file] = true;
+				possibleMoves[rank + 1][file] = 1;
 				// Starting position 2-step
 				if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY)
-					possibleMoves[rank + 2][file] = true;
+					possibleMoves[rank + 2][file] = 1;
 			}
 			// Diag. capture, Southwest
 			if(file != 1 && board[rank + 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file - 1].teamColor)
-				possibleMoves[rank + 1][file - 1] = true;
+				possibleMoves[rank + 1][file - 1] = 1;
 			// Diag. capture, Southeast
 			if(file != 8 && board[rank + 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file + 1].teamColor)
-				possibleMoves[rank + 1][file + 1] = true;
+				possibleMoves[rank + 1][file + 1] = 1;
 
 			// En passant
 			if(rank == 5) {
-				if( // Capture down and left
-						file != 1 &&
-						board[rank][file - 1].type == Piece.WHITE_PAWN &&
-						board[rank + 2][file - 1].type == Piece.EMPTY &&
-						board[rank + 1][file - 1].type == Piece.EMPTY &&
-						doneMoveStack.peekLast().getBoard()[rank + 2][file - 1].type == Piece.WHITE_PAWN
-				) {
-					System.out.println("yay");
-					possibleMoves[rank + 1][file - 1] = true;
-				}
-				else {
-					// TODO: All elements of doneMoveStack are the same. Idk why
-					while(doneMoveStack.peekLast() != null) {
-						for(int rank2 = 1; rank2 <= 8; rank2++) {
-							for(int file2 = 1; file2 <= 8; file2++) {
-								System.out.print(doneMoveStack.peekLast().getBoard()[rank2][file2].type + " ");
-							}
-							System.out.println();
-						}
-						System.out.println();
-						doneMoveStack.pop();
+				State lastState = doneMoveStack.peekLast();
+				if(lastState != null) {
+					Piece[][] lastBoard = lastState.getBoard();
+					// Capture down and left
+					if(file != 1 &&
+							board[rank][file-1].type == Piece.WHITE_PAWN &&
+							board[rank+2][file-1].type == Piece.EMPTY &&
+							board[rank+1][file-1].type == Piece.EMPTY &&
+							lastBoard[rank+2][file-1].type == Piece.WHITE_PAWN) {
+						possibleMoves[rank+1][file-1] = 2;
 					}
-				}
-				if( // Capture down and right
-						file != 8 &&
-						board[rank][file + 1].type == Piece.WHITE_PAWN &&
-						board[rank + 2][file + 1].type == Piece.EMPTY &&
-						board[rank + 1][file + 1].type == Piece.EMPTY &&
-						doneMoveStack.peekLast().getBoard()[rank + 2][file + 1].type == Piece.WHITE_PAWN
-				) {
-					possibleMoves[rank + 1][file + 1] = true;
+					// Capture down and right
+					else if(file != 8 &&
+							board[rank][file+1].type == Piece.WHITE_PAWN &&
+							board[rank+2][file+1].type == Piece.EMPTY &&
+							board[rank+1][file+1].type == Piece.EMPTY &&
+							lastBoard[rank+2][file+1].type == Piece.WHITE_PAWN) {
+						possibleMoves[rank+1][file+1] = 2;
+					}
 				}
 			}
 		}
@@ -122,39 +110,41 @@ abstract class MoveRules {
 			// Forward movement
 			if(board[rank - 1][file].teamColor == Piece.EMPTY) {
 				// Default 1-square step
-				possibleMoves[rank - 1][file] = true;
+				possibleMoves[rank - 1][file] = 1;
 				// Starting position 2-step
 				if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY)
-					possibleMoves[rank - 2][file] = true;
+					possibleMoves[rank - 2][file] = 1;
 			}
 			// Diag. capture, Northwest
 			if(file != 1 && board[rank - 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file - 1].teamColor)
-				possibleMoves[rank - 1][file - 1] = true;
+				possibleMoves[rank - 1][file - 1] = 1;
 			// Diag. capture, Northeast
 			if(file != 8 && board[rank - 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file + 1].teamColor)
-				possibleMoves[rank - 1][file + 1] = true;
+				possibleMoves[rank - 1][file + 1] = 1;
 
 			// En passant
 			if(rank == 4) {
-				if( // Capture up and left
-						file != 1 &&
-								board[rank][file - 1].type == Piece.BLACK_PAWN &&
-								board[rank - 2][file - 1].type == Piece.EMPTY &&
-								board[rank - 1][file - 1].type == Piece.EMPTY &&
-								doneMoveStack.peekLast().getBoard()[rank - 2][file - 1].type == Piece.BLACK_PAWN
-				) {
-					possibleMoves[rank - 1][file - 1] = true;
-				}
-				if( // Capture down and right
-						file != 8 &&
-								board[rank][file + 1].type == Piece.BLACK_PAWN &&
-								board[rank - 2][file + 1].type == Piece.EMPTY &&
-								board[rank - 1][file + 1].type == Piece.EMPTY &&
-								doneMoveStack.peekLast().getBoard()[rank - 2][file + 1].type == Piece.BLACK_PAWN
-				) {
-					possibleMoves[rank - 1][file + 1] = true;
+				State lastState = doneMoveStack.peekLast();
+				if(lastState != null) {
+					Piece[][] lastBoard = lastState.getBoard();
+					// Capture up and left
+					if(     file != 1 &&
+							board[rank][file-1].type == Piece.BLACK_PAWN &&
+							board[rank-2][file-1].type == Piece.EMPTY &&
+							board[rank-1][file-1].type == Piece.EMPTY &&
+							lastBoard[rank-2][file-1].type == Piece.BLACK_PAWN) {
+						possibleMoves[rank-1][file-1] = 2;
+					}
+					// Capture down and right
+					else if(file != 8 &&
+							board[rank][file+1].type == Piece.BLACK_PAWN &&
+							board[rank-2][file+1].type == Piece.EMPTY &&
+							board[rank-1][file+1].type == Piece.EMPTY &&
+							lastBoard[rank-2][file+1].type == Piece.BLACK_PAWN) {
+						possibleMoves[rank-1][file+1] = 2;
+					}
 				}
 			}
 		}
@@ -168,8 +158,8 @@ abstract class MoveRules {
 	 * @param file the file of the knight
 	 * @return the possible doneMoveStack of the knight
 	 */
-	static boolean[][] getKnightMoves(Piece[][] board, int rank, int file) {
-		boolean[][] possibleMoves = new boolean[10][10];
+	static int[][] getKnightMoves(Piece[][] board, int rank, int file) {
+		int[][] possibleMoves = new int[10][10];
 		int knightColor = board[rank][file].teamColor;
 		int[] xOffsets = new int[] {-2, -2, -1, -1, +1, +1, +2, +2};
 		int[] yOffsets = new int[] {-1, +1, -2, +2, -2, +2, -1, +1};
@@ -179,7 +169,7 @@ abstract class MoveRules {
 			if(newRank >= 1 && newRank <= 8
 				&& newFile >= 1 && newFile <= 8
 				&& board[newRank][newFile].teamColor != knightColor)
-				possibleMoves[newRank][newFile] = true;
+				possibleMoves[newRank][newFile] = 1;
 		}
 
 		return possibleMoves;
@@ -192,11 +182,11 @@ abstract class MoveRules {
 	 * @param file the file of the bishop
 	 * @return the possible doneMoveStack of the bishop
 	 */
-	static boolean[][] getBishopMoves(Piece[][] board, int rank, int file) {
-		boolean[][] possibleMoves = new boolean[10][10];
+	static int[][] getBishopMoves(Piece[][] board, int rank, int file) {
+		int[][] possibleMoves = new int[10][10];
 
-		int rankTo = rank;
-		int fileTo = file;
+		int rankTo;
+		int fileTo;
 		int bishopColor = board[rank][file].teamColor;
 		int[] xOffsets = new int[] {+1, +1, -1, -1};
 		int[] yOffsets = new int[] {+1, -1, +1, -1};
@@ -208,10 +198,10 @@ abstract class MoveRules {
 				fileTo += xOffsets[i];
 				if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8) {
 					if(board[rankTo][fileTo].teamColor + bishopColor == 3) { // OPPOSITE COLORS
-						possibleMoves[rankTo][fileTo] = true;
+						possibleMoves[rankTo][fileTo] = 1;
 						break;
 					} else if(board[rankTo][fileTo].teamColor == Piece.EMPTY) { // EMPTY SQUARE
-						possibleMoves[rankTo][fileTo] = true;
+						possibleMoves[rankTo][fileTo] = 1;
 					} else { // SAME COLOR
 						break;
 					}
@@ -230,11 +220,11 @@ abstract class MoveRules {
      * @param file the file of the rook
      * @return the possible doneMoveStack of the rook
      */
-    static boolean[][] getRookMoves(Piece[][] board, int rank, int file) {
-        boolean[][] possibleMoves = new boolean[10][10];
+    static int[][] getRookMoves(Piece[][] board, int rank, int file) {
+        int[][] possibleMoves = new int[10][10];
 
-        int rankTo = rank;
-        int fileTo = file;
+        int rankTo;
+        int fileTo;
         int rookColor = board[rank][file].teamColor;
         int[] xOffsets = new int[] {+1, -1, +0, +0};
         int[] yOffsets = new int[] {+0, +0, +1, -1};
@@ -246,10 +236,10 @@ abstract class MoveRules {
                 fileTo += xOffsets[i];
                 if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8) {
                     if(board[rankTo][fileTo].teamColor + rookColor == 3) { // OPPOSITE COLORS
-                        possibleMoves[rankTo][fileTo] = true;
+                        possibleMoves[rankTo][fileTo] = 1;
                         break;
                     } else if(board[rankTo][fileTo].teamColor == Piece.EMPTY) { // EMPTY SQUARE
-                        possibleMoves[rankTo][fileTo] = true;
+                        possibleMoves[rankTo][fileTo] = 1;
                     } else { // SAME COLOR
                         break;
                     }
@@ -268,16 +258,13 @@ abstract class MoveRules {
      * @param file the file of the queen
      * @return the possible doneMoveStack of the queen
      */
-    static boolean[][] getQueenMoves(Piece[][] board, int rank, int file) {
-        boolean[][] possibleMoves = new boolean[10][10];
-        boolean[][] bishopMoves   = getBishopMoves(board, rank, file);
-        boolean[][] rookMoves     = getRookMoves(board, rank, file);
-        for(int rankTo = 1; rankTo <= 8; rankTo++) {
-            for(int fileTo = 1; fileTo <= 8; fileTo++) {
-                if(bishopMoves[rankTo][fileTo] || rookMoves[rankTo][fileTo])
-                    possibleMoves[rankTo][fileTo] = true;
-            }
-        }
+    static int[][] getQueenMoves(Piece[][] board, int rank, int file) {
+        int[][] possibleMoves = new int[10][10];
+        int[][] bishopMoves   = getBishopMoves(board, rank, file);
+        int[][] rookMoves     = getRookMoves(board, rank, file);
+        for(int rankTo = 1; rankTo <= 8; rankTo++)
+            for(int fileTo = 1; fileTo <= 8; fileTo++)
+            	possibleMoves[rankTo][fileTo] = bishopMoves[rankTo][fileTo] + rookMoves[rankTo][fileTo];
         return possibleMoves;
     }
 
@@ -288,8 +275,8 @@ abstract class MoveRules {
      * @param file the file of the king
      * @return the possible doneMoveStack of the king
      */
-    static boolean[][] getKingMoves(Piece[][] board, int rank, int file) {
-        boolean[][] possibleMoves = new boolean[10][10];
+    static int[][] getKingMoves(Piece[][] board, int rank, int file) {
+        int[][] possibleMoves = new int[10][10];
 
         int kingColor = board[rank][file].teamColor;
         int[] xOffsets = new int[] {-1, -1, -1, +0, +0, +1, +1, +1};
@@ -299,9 +286,8 @@ abstract class MoveRules {
             int fileTo = file + xOffsets[i];
             if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8
                 && board[rankTo][fileTo].teamColor != kingColor)
-                possibleMoves[rankTo][fileTo] = true;
+                possibleMoves[rankTo][fileTo] = 1;
         }
-
         return possibleMoves;
     }
 }
