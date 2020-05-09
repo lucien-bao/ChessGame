@@ -82,8 +82,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         
         whiteToMove = true;
         
-        doneMoveStack = new ArrayDeque<>();
-        undoneMoveStack = new ArrayDeque<>();
+        doneMoveStack = new ArrayDeque<State>();
+        undoneMoveStack = new ArrayDeque<State>();
 	}
 	
 	// METHODS
