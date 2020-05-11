@@ -52,6 +52,7 @@ class Piece {
 	// FIELDS
 	int teamColor;
 	int type;
+	boolean hasMoved;
 	
 	// CONSTRUCTORS
 	Piece(int type) {
@@ -62,6 +63,7 @@ class Piece {
 			this.teamColor = WHITE;
 		else
 			this.teamColor = BLACK;
+		this.hasMoved = false;
 	}
 	
 	// METHODS

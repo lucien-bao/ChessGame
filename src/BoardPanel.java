@@ -96,13 +96,22 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		undoneMoveStack.clear();
 		grid[endRank][endFile] = grid[startRank][startFile];
 		grid[startRank][startFile] = new Piece(Piece.EMPTY);
-		if(moveType == 2) {
+		if(moveType == 2) { // EN PASSANT
 			if(grid[endRank][endFile].teamColor == Piece.WHITE) {   // WHITE EN PASSANT
 				grid[endRank+1][endFile] = new Piece(Piece.EMPTY);
 			} else {                                                // BLACK EN PASSANT
 				grid[endRank-1][endFile] = new Piece(Piece.EMPTY);
 			}
+		} else if(moveType == 3) { // CASTLING
+			if(endFile > startFile) { // KINGSIDE
+				grid[endRank][6] = grid[endRank][8];
+				grid[endRank][8] = new Piece(Piece.EMPTY);
+			} else { // QUEENSIDE
+				grid[endRank][4] = grid[endRank][1];
+				grid[endRank][1] = new Piece(Piece.EMPTY);
+			}
 		}
+		grid[endRank][endFile].hasMoved = true;
 		whiteToMove = !whiteToMove;
 	}
 	
@@ -221,6 +230,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * Sets the board to the default arrangement.
 	 */
 	void setBoard() {
+		whiteToMove = true;
+
 		// PAWNS
 		for(int file = 1; file <= 8; file++) {
 			grid[2][file] = new Piece(Piece.BLACK_PAWN);

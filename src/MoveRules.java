@@ -287,6 +287,34 @@ abstract class MoveRules {
                 && board[rankTo][fileTo].teamColor != kingColor)
                 possibleMoves[rankTo][fileTo] = 1;
         }
+
+        // CASTLING
+		// TODO: detect if king is in check or will pass over checked square
+		// TODO: needs general implementation of checking for check
+		if(!board[rank][file].hasMoved) {
+			// Kingside
+			if(		board[rank][file + 1].type == Piece.EMPTY &&
+					board[rank][file + 2].type == Piece.EMPTY &&
+					(board[rank][file + 3].type == Piece.WHITE_ROOK ||
+							board[rank][file + 3].type == Piece.BLACK_ROOK) &&
+					board[rank][file + 3].teamColor == kingColor &&
+					!board[rank][file + 3].hasMoved
+			) {
+				possibleMoves[rank][file + 2] = 3;
+			}
+			// Queenside
+			// Kingside
+			if(		board[rank][file - 1].type == Piece.EMPTY &&
+					board[rank][file - 2].type == Piece.EMPTY &&
+					(board[rank][file - 4].type == Piece.WHITE_ROOK ||
+							board[rank][file - 4].type == Piece.BLACK_ROOK) &&
+					board[rank][file - 4].teamColor == kingColor &&
+					!board[rank][file - 4].hasMoved
+			) {
+				possibleMoves[rank][file - 2] = 3;
+			}
+		}
+
         return possibleMoves;
     }
 }
