@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.15
+ * @version 0.1.16
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -56,26 +56,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		grid = new Piece[10][10];
 		// makes all pieces empty squares to start
 		// sets edge pieces to labels
-        for(int rank = 0; rank <= 9; rank++) {
-            for(int file = 0; file <= 9; file++) {
-                grid[rank][file] = new Piece(Piece.EMPTY);
-                if((file == 0 || file == 9) && rank > 0 && rank < 9) {
-					grid[rank][file] = new Piece(Piece.LABEL_ONE + rank - 1);
-				} else if((rank == 0 || rank == 9) && file > 0 && file < 9) {
-					grid[rank][file] = new Piece(Piece.LABEL_A + file - 1);
-				}
-            }
-        }
-        // TEST OF getPossibleMoves METHOD
-        grid[7][7] = new Piece(Piece.WHITE_PAWN);
-        grid[2][3] = new Piece(Piece.BLACK_KNIGHT);
-        grid[5][4] = new Piece(Piece.WHITE_KNIGHT);
-        grid[2][8] = new Piece(Piece.BLACK_PAWN);
-        grid[4][5] = new Piece(Piece.BLACK_BISHOP);
-        grid[3][6] = new Piece(Piece.WHITE_BISHOP);
-        grid[4][4] = new Piece(Piece.WHITE_ROOK);
-        grid[7][6] = new Piece(Piece.BLACK_QUEEN);
-        grid[5][5] = new Piece(Piece.BLACK_KING);
+        grid = resetBoard();
 
         selectedRank = 0;
         selectedFile = 0;
@@ -85,7 +66,47 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         doneMoveStack = new ArrayDeque<State>();
         undoneMoveStack = new ArrayDeque<State>();
 	}
-	
+
+	Piece[][] resetBoard() {
+		Piece[][] board = new Piece[10][10];
+		for(int rank = 0; rank <= 9; rank++) {
+			for(int file = 0; file <= 9; file++) {
+				board[rank][file] = new Piece(Piece.EMPTY);
+				if((file == 0 || file == 9) && rank > 0 && rank < 9) {
+					board[rank][file] = new Piece(Piece.LABEL_ONE + rank - 1);
+				} else if((rank == 0 || rank == 9) && file > 0 && file < 9) {
+					board[rank][file] = new Piece(Piece.LABEL_A + file - 1);
+				}
+			}
+		}
+		// PAWNS
+		for(int i = 1; i <= 8; i++) {
+			board[2][i] = new Piece(Piece.BLACK_PAWN);
+			board[7][i] = new Piece(Piece.WHITE_PAWN);
+		}
+		// BISHOPS
+		for(int i : new int[]{3, 6}) {
+			board[1][i] = new Piece(Piece.BLACK_BISHOP);
+			board[8][i] = new Piece(Piece.WHITE_BISHOP);
+		}
+		// KNIGHTS
+		for(int i : new int[]{2, 7}) {
+			board[1][i] = new Piece(Piece.BLACK_KNIGHT);
+			board[8][i] = new Piece(Piece.WHITE_KNIGHT);
+		}
+		// ROOKS
+		for(int i : new int[]{1, 8}) {
+			board[1][i] = new Piece(Piece.BLACK_ROOK);
+			board[8][i] = new Piece(Piece.WHITE_ROOK);
+		}
+		// KINGS/QUEENS
+		board[1][4] = new Piece(Piece.BLACK_QUEEN);
+		board[1][5] = new Piece(Piece.BLACK_KING);
+		board[8][4] = new Piece(Piece.WHITE_QUEEN);
+		board[8][5] = new Piece(Piece.WHITE_KING);
+		return board;
+	}
+
 	// METHODS
 	/**
 	 * Resizes the panel to the specified length
