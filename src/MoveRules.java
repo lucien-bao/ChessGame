@@ -125,27 +125,26 @@ abstract class MoveRules {
 				possibleMoves[rank - 1][file + 1] = 1;
 
 			// En passant
-			if(rank == 4) {
-				State lastState = doneMoveStack.peekLast();
-				if(lastState != null) {
-					Piece[][] lastBoard = lastState.getBoard();
-					// Capture up and left
-					if(     file != 1 &&
-							board[rank][file-1].type == Piece.BLACK_PAWN &&
-							board[rank-2][file-1].type == Piece.EMPTY &&
-							board[rank-1][file-1].type == Piece.EMPTY &&
-							lastBoard[rank-2][file-1].type == Piece.BLACK_PAWN) {
-						possibleMoves[rank-1][file-1] = 2;
-					}
-					// Capture down and right
-					else if(file != 8 &&
-							board[rank][file+1].type == Piece.BLACK_PAWN &&
-							board[rank-2][file+1].type == Piece.EMPTY &&
-							board[rank-1][file+1].type == Piece.EMPTY &&
-							lastBoard[rank-2][file+1].type == Piece.BLACK_PAWN) {
-						possibleMoves[rank-1][file+1] = 2;
-					}
-				}
+			if(rank == 4 && doneMoveStack.size() >= 3) {
+				Piece[][] blackLastBoard = doneMoveStack.pop().getBoard();
+				// Capture up and left
+				if(     file != 1 &&
+						board[rank][file-1].type == Piece.BLACK_PAWN &&         // Pawn to capture
+						board[rank-2][file-1].type == Piece.EMPTY &&            // Pawn init. square 
+						board[rank-1][file-1].type == Piece.EMPTY &&            // Square to move
+						blackLastBoard[rank-2][file-1].type == Piece.BLACK_PAWN // Last move by Black
+				)
+					possibleMoves[rank-1][file-1] = 2;
+				// Capture down and right
+				else if(file != 8 &&
+						board[rank][file+1].type == Piece.BLACK_PAWN &&
+						board[rank-2][file+1].type == Piece.EMPTY &&
+						board[rank-1][file+1].type == Piece.EMPTY &&
+						blackLastBoard[rank-2][file+1].type == Piece.BLACK_PAWN
+				)
+					possibleMoves[rank-1][file+1] = 2;
+				
+				doneMoveStack.push(new State(blackLastBoard));
 			}
 		}
 		return possibleMoves;

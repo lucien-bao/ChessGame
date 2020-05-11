@@ -1,13 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayDeque;
+import java.util.*;
 
 /**
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.16
+ * @version 0.1.15
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -31,10 +31,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	final int POSS_MOVE_RGBA        = (POSS_MOVE_OPAQUE & 16777215) | ((int) (POSS_MOVE_ALPHA*255) << 24);
 	final Color POSS_MOVE_COLOR     = new Color(POSS_MOVE_RGBA, true);
 
-	final RenderingHints RENDERING_HINTS = new RenderingHints(
-			RenderingHints.KEY_ANTIALIASING,
-			RenderingHints.VALUE_ANTIALIAS_ON
-	);
+	final RenderingHints RENDERING_HINTS;
 	
 	// FIELDS
 	Piece[][] grid;
@@ -53,60 +50,24 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		// Forces Java to recognize drawing of panels beneath this one (i.e. BackgroundPanel)
 		this.setOpaque(false);
 		addMouseListener(this);
+		
+		RENDERING_HINTS = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		RENDERING_HINTS.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		
 		grid = new Piece[10][10];
-		// makes all pieces empty squares to start
-		// sets edge pieces to labels
-        grid = resetBoard();
+		
+		addLabels();
+		setBoard();
 
         selectedRank = 0;
         selectedFile = 0;
         
         whiteToMove = true;
         
-        doneMoveStack = new ArrayDeque<State>();
-        undoneMoveStack = new ArrayDeque<State>();
+        doneMoveStack = new ArrayDeque<>();
+        undoneMoveStack = new ArrayDeque<>();
 	}
-
-	Piece[][] resetBoard() {
-		Piece[][] board = new Piece[10][10];
-		for(int rank = 0; rank <= 9; rank++) {
-			for(int file = 0; file <= 9; file++) {
-				board[rank][file] = new Piece(Piece.EMPTY);
-				if((file == 0 || file == 9) && rank > 0 && rank < 9) {
-					board[rank][file] = new Piece(Piece.LABEL_ONE + rank - 1);
-				} else if((rank == 0 || rank == 9) && file > 0 && file < 9) {
-					board[rank][file] = new Piece(Piece.LABEL_A + file - 1);
-				}
-			}
-		}
-		// PAWNS
-		for(int i = 1; i <= 8; i++) {
-			board[2][i] = new Piece(Piece.BLACK_PAWN);
-			board[7][i] = new Piece(Piece.WHITE_PAWN);
-		}
-		// BISHOPS
-		for(int i : new int[]{3, 6}) {
-			board[1][i] = new Piece(Piece.BLACK_BISHOP);
-			board[8][i] = new Piece(Piece.WHITE_BISHOP);
-		}
-		// KNIGHTS
-		for(int i : new int[]{2, 7}) {
-			board[1][i] = new Piece(Piece.BLACK_KNIGHT);
-			board[8][i] = new Piece(Piece.WHITE_KNIGHT);
-		}
-		// ROOKS
-		for(int i : new int[]{1, 8}) {
-			board[1][i] = new Piece(Piece.BLACK_ROOK);
-			board[8][i] = new Piece(Piece.WHITE_ROOK);
-		}
-		// KINGS/QUEENS
-		board[1][4] = new Piece(Piece.BLACK_QUEEN);
-		board[1][5] = new Piece(Piece.BLACK_KING);
-		board[8][4] = new Piece(Piece.WHITE_QUEEN);
-		board[8][5] = new Piece(Piece.WHITE_KING);
-		return board;
-	}
-
+	
 	// METHODS
 	/**
 	 * Resizes the panel to the specified length
@@ -241,6 +202,52 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 							squareSize / 2, squareSize / 2);
 	}
 	
+	/**
+	 * Add letter/number squares, set all other pieces to <code>Piece.EMPTY</code>
+	 */
+	private void addLabels() {
+		for(int rank = 0; rank <= 9; rank++) {
+			for(int file = 0; file <= 9; file++) {
+				grid[rank][file] = new Piece(Piece.EMPTY);
+				if((file == 0 || file == 9) && rank > 0 && rank < 9)
+					grid[rank][file] = new Piece(Piece.LABEL_ONE + rank - 1);
+				else if((rank == 0 || rank == 9) && file > 0 && file < 9)
+					grid[rank][file] = new Piece(Piece.LABEL_A + file - 1);
+			}
+		}
+	}
+	
+	/**
+	 * Sets the board to the default arrangement.
+	 */
+	void setBoard() {
+		// PAWNS
+		for(int file = 1; file <= 8; file++) {
+			grid[2][file] = new Piece(Piece.BLACK_PAWN);
+			grid[7][file] = new Piece(Piece.WHITE_PAWN);
+		}
+		
+		// PIECES
+		for(int file = 1; file <= 8; file++) {
+			if(file == 1 || file == 8) {
+				grid[1][file] = new Piece(Piece.BLACK_ROOK);
+				grid[8][file] = new Piece(Piece.WHITE_ROOK);
+			} else if(file == 2 || file == 7) {
+				grid[1][file] = new Piece(Piece.BLACK_KNIGHT);
+				grid[8][file] = new Piece(Piece.WHITE_KNIGHT);
+			} else if(file == 3 || file == 6) {
+				grid[1][file] = new Piece(Piece.BLACK_BISHOP);
+				grid[8][file] = new Piece(Piece.WHITE_BISHOP);
+			} else if(file == 4) {
+				grid[1][file] = new Piece(Piece.BLACK_QUEEN);
+				grid[8][file] = new Piece(Piece.WHITE_QUEEN);
+			} else {
+				grid[1][file] = new Piece(Piece.BLACK_KING);
+				grid[8][file] = new Piece(Piece.WHITE_KING);
+			}
+		}
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		/*
@@ -295,10 +302,9 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
+	// TODO: alternate method of moving pieces
 	@Override
-	public void mouseDragged(MouseEvent e) {
-		
-	}
+	public void mouseDragged(MouseEvent e) {}
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {}
