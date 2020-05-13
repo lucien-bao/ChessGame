@@ -5,7 +5,7 @@ import java.awt.*;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.3
+ * @version 0.9.3
  * @since 4 APR 2020
  */
 public class InfoPanel extends JPanel {

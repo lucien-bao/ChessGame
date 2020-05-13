@@ -9,7 +9,7 @@ import java.io.*;
  * <code>Frame</code> class. This represents the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.10
+ * @version 0.9.10
  * @since 4 APR 2020
  */
 class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {

@@ -8,7 +8,7 @@ import java.io.*;
  * <code>BackgroundPanel</code> class. Displays the background image.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.2
+ * @version 0.9.2
  * @since 22 APR 2020
  */
 public class BackgroundPanel extends JPanel {

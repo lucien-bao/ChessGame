@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.17
+ * @version 0.9.17
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -151,6 +151,17 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		graphics2d.fillRect(0, 0, length, length);
 		for(int rank = 0; rank < 10; rank++) {
 			for(int file = 0; file < 10; file++) {
+				// Outside board
+				if(file == 0 || file == 9 || rank == 0 || rank == 9) {
+					graphics2d.setColor(LIGHT_SQUARE_COLOR);
+					graphics2d.fillRect(
+							outsideGrid / 2 + squareSize * file,
+							outsideGrid / 2 + squareSize * rank,
+							squareSize, squareSize
+					);
+					continue;
+				}
+				
 				// Square background
 				if((file + rank) % 2 == 0)
 					graphics2d.setColor(LIGHT_SQUARE_COLOR);
@@ -168,21 +179,20 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		// NUMBER/LETTER SQUARES
         for(int rank = 0; rank < 10; rank++) {
             for(int file = 0; file < 10; file++) {
-            	// NUMBER SQUARES
+            	// LETTER SQUARES
                 if(rank == 0 || rank == 9) {
                     if(file == 0 || file == 9)
                         continue;
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
-                    graphics2d.setColor(Color.CYAN);
-                    graphics2d.fillOval(x, y, squareSize, squareSize);
+                    graphics2d.drawImage(Piece.images[file+Piece.LABEL_A], x, y, squareSize, squareSize, this);
                 }
-                // LETTER SQUARES
+                // NUMBER SQUARES
                 else if(file == 0 || file == 9) {
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
-                    graphics2d.setColor(Color.MAGENTA);
-                    graphics2d.fillOval(x, y, squareSize, squareSize);
+                    // Has to be inverted (8-rank) because the computer y-coords are opposite chessboard ones
+	                graphics2d.drawImage(Piece.images[8-rank+Piece.LABEL_ONE], x, y, squareSize, squareSize, this);
                 }
             }
         }

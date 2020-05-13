@@ -2,7 +2,7 @@
  * <code>Driver</code> class. The game is run through here.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.4
+ * @version 0.9.4
  * @since 4 APR 2020
  */
 public class Driver {
