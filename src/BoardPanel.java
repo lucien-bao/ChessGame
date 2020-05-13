@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.1.16
+ * @version 0.1.17
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -200,7 +200,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	        }
         }
 		// POSS. MOVES
-		int[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
+		int[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
 		graphics2d.setColor(POSS_MOVE_COLOR);
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
@@ -275,7 +275,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
 		if(selectedFile != 0) {     // PIECE IS SELECTED
-			int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack);
+			int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
 			int moveType = possMoves[clickedRank][clickedFile];
 			if(moveType != 0) {          // PERFORM VALID MOVE
 				doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);

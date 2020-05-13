@@ -72,7 +72,7 @@ class Piece {
 		int i = 1;
 		try {
 			for(; i <= 12; i++) {
-				File f = new File("img/" + i + ".png");
+				File f = new File("img/L" + i + ".png");
 				images[i] = ImageIO.read(f);
 			}
 		} catch(IOException e) {
