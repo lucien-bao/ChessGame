@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.14
+ * @version 0.9.15
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -298,9 +298,16 @@ abstract class MoveRules {
             if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8
                 && board[rankTo][fileTo].teamColor != kingColor) {
             	if(isKingWhite == whiteToMove) {
+            		// move king to square, then check if it's attacked
+					// needed to prevent king from moving away from attacking piece
+            		Piece oldPiece = board[rankTo][fileTo];
+            		board[rankTo][fileTo] = board[rank][file];
+            		board[rank][file] = new Piece(Piece.EMPTY);
 					if(!isSquareAttacked(board, rankTo, fileTo, whiteToMove, doneMoveStack)) {
 						possibleMoves[rankTo][fileTo] = 1;
 					}
+					board[rank][file] = board[rankTo][fileTo];
+					board[rankTo][fileTo] = oldPiece;
 				}
             	else
 					possibleMoves[rankTo][fileTo] = 1;
@@ -308,8 +315,6 @@ abstract class MoveRules {
         }
 
         // CASTLING
-		// TODO: detect if king is in check or will pass over checked square
-		// TODO: needs general implementation of checking for check
 		if(!board[rank][file].hasMoved) {
 			// Kingside
 			if(		board[rank][file + 1].type == Piece.EMPTY &&
@@ -358,16 +363,7 @@ abstract class MoveRules {
     				continue;
     			boolean pieceColorWhite = (board[rank][file].teamColor == Piece.WHITE);
     			if(pieceColorWhite != whiteToMove) {
-    				// This is needed to detect pawn captures
-					// Pawns can only capture diagonally if there is a piece there
-    				Piece oldPiece = board[squareRank][squareFile];
-    				if(pieceColorWhite)
-						board[squareRank][squareFile] = new Piece(Piece.BLACK_ROOK);
-    				else
-    					board[squareRank][squareFile] = new Piece(Piece.WHITE_ROOK);
-
 					int[][] possibleMoves = getPossMoves(board, rank, file, doneMoveStack, whiteToMove);
-					board[squareRank][squareFile] = oldPiece;
 					if(possibleMoves[squareRank][squareFile] > 0)
 						return true;
 				}
