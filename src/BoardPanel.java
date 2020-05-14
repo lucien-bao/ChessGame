@@ -185,7 +185,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
                         continue;
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
-                    graphics2d.drawImage(Piece.images[file+Piece.LABEL_A], x, y, squareSize, squareSize, this);
+                    graphics2d.drawImage(Piece.images[file-1+Piece.LABEL_A], x, y, squareSize, squareSize, this);
                 }
                 // NUMBER SQUARES
                 else if(file == 0 || file == 9) {

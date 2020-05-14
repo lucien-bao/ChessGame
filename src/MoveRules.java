@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.13
+ * @version 0.9.14
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -296,10 +296,14 @@ abstract class MoveRules {
             int rankTo = rank + yOffsets[i];
             int fileTo = file + xOffsets[i];
             if(rankTo >= 1 && rankTo <= 8 && fileTo >= 1 && fileTo <= 8
-                && board[rankTo][fileTo].teamColor != kingColor
-				&& isKingWhite == whiteToMove
-				&& !isSquareAttacked(board, rankTo, fileTo, whiteToMove, doneMoveStack)) {
-				possibleMoves[rankTo][fileTo] = 1;
+                && board[rankTo][fileTo].teamColor != kingColor) {
+            	if(isKingWhite == whiteToMove) {
+					if(!isSquareAttacked(board, rankTo, fileTo, whiteToMove, doneMoveStack)) {
+						possibleMoves[rankTo][fileTo] = 1;
+					}
+				}
+            	else
+					possibleMoves[rankTo][fileTo] = 1;
 			}
         }
 
@@ -313,7 +317,10 @@ abstract class MoveRules {
 					(board[rank][file + 3].type == Piece.WHITE_ROOK ||
 							board[rank][file + 3].type == Piece.BLACK_ROOK) &&
 					board[rank][file + 3].teamColor == kingColor &&
-					!board[rank][file + 3].hasMoved
+					!board[rank][file + 3].hasMoved &&
+					!isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
+					!isSquareAttacked(board, rank, file + 1, whiteToMove, doneMoveStack) &&
+					!isSquareAttacked(board, rank, file + 2, whiteToMove, doneMoveStack)
 			) {
 				possibleMoves[rank][file + 2] = 3;
 			}
@@ -324,7 +331,10 @@ abstract class MoveRules {
 					(board[rank][file - 4].type == Piece.WHITE_ROOK ||
 							board[rank][file - 4].type == Piece.BLACK_ROOK) &&
 					board[rank][file - 4].teamColor == kingColor &&
-					!board[rank][file - 4].hasMoved
+					!board[rank][file - 4].hasMoved &&
+					!isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
+					!isSquareAttacked(board, rank, file - 1, whiteToMove, doneMoveStack) &&
+					!isSquareAttacked(board, rank, file - 2, whiteToMove, doneMoveStack)
 			) {
 				possibleMoves[rank][file - 2] = 3;
 			}
@@ -344,17 +354,23 @@ abstract class MoveRules {
     static boolean isSquareAttacked(Piece[][] board, int squareRank, int squareFile, boolean whiteToMove, ArrayDeque<State> doneMoveStack) {
     	for(int rank = 1; rank <= 8; rank++) {
     		for(int file = 1; file <= 8; file++) {
-    			boolean squareColorWhite;
-				squareColorWhite = board[squareRank][squareFile].teamColor == Piece.WHITE;
     			if(board[rank][file].teamColor == Piece.EMPTY)
     				continue;
-    			if(board[rank][file].teamColor == Piece.WHITE && squareColorWhite)
-    				continue;
-    			if(board[rank][file].teamColor == Piece.BLACK && !squareColorWhite)
-    				continue;
-    			int[][] possibleMoves = getPossMoves(board, rank, file, doneMoveStack, whiteToMove);
-    			if(possibleMoves[squareRank][squareFile] > 0)
-    				return true;
+    			boolean pieceColorWhite = (board[rank][file].teamColor == Piece.WHITE);
+    			if(pieceColorWhite != whiteToMove) {
+    				// This is needed to detect pawn captures
+					// Pawns can only capture diagonally if there is a piece there
+    				Piece oldPiece = board[squareRank][squareFile];
+    				if(pieceColorWhite)
+						board[squareRank][squareFile] = new Piece(Piece.BLACK_ROOK);
+    				else
+    					board[squareRank][squareFile] = new Piece(Piece.WHITE_ROOK);
+
+					int[][] possibleMoves = getPossMoves(board, rank, file, doneMoveStack, whiteToMove);
+					board[squareRank][squareFile] = oldPiece;
+					if(possibleMoves[squareRank][squareFile] > 0)
+						return true;
+				}
 			}
 		}
     	return false;
