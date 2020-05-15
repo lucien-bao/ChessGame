@@ -41,6 +41,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	int selectedRank;
 	int selectedFile;
 	boolean whiteToMove;
+	
+	int set; // This is the chess set (i.e., what the pieces look like) to use
 
 	ArrayDeque<State> doneMoveStack;
 	ArrayDeque<State> undoneMoveStack;
@@ -53,6 +55,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		
 		RENDERING_HINTS = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		RENDERING_HINTS.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		
+		set = 0;
 		
 		grid = new Piece[10][10];
 		
@@ -185,14 +189,14 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
                         continue;
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
-                    graphics2d.drawImage(Piece.images[file-1+Piece.LABEL_A], x, y, squareSize, squareSize, this);
+                    graphics2d.drawImage(Piece.labels[file-1+Piece.LABEL_A], x, y, squareSize, squareSize, this);
                 }
                 // NUMBER SQUARES
                 else if(file == 0 || file == 9) {
                     int y = rank * squareSize + outsideGrid / 2;
                     int x = file * squareSize + outsideGrid / 2;
                     // Has to be inverted (8-rank) because the computer y-coords are opposite chessboard ones
-	                graphics2d.drawImage(Piece.images[8-rank+Piece.LABEL_ONE], x, y, squareSize, squareSize, this);
+	                graphics2d.drawImage(Piece.labels[8-rank+Piece.LABEL_ONE], x, y, squareSize, squareSize, this);
                 }
             }
         }
@@ -201,7 +205,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         	for(int file = 1; file <= 8; file++) {
 		        if(grid[rank][file].type != Piece.EMPTY)
 			        graphics2d.drawImage(
-			                Piece.images[grid[rank][file].type],
+			        		Piece.pieces[0][grid[rank][file].type],
 			        		outsideGrid / 2 + squareSize * file,
 					        outsideGrid / 2 + squareSize * rank,
 					        squareSize, squareSize,
