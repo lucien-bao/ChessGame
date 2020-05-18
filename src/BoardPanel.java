@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.17
+ * @version 0.9.18
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -246,6 +246,11 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	void setBoard() {
 		whiteToMove = true;
 
+		for(int rank = 1; rank <= 8; rank++) {
+			for(int file = 1; file <= 8; file++) {
+				grid[rank][file] = new Piece(Piece.EMPTY);
+			}
+		}
 		// PAWNS
 		for(int file = 1; file <= 8; file++) {
 			grid[2][file] = new Piece(Piece.BLACK_PAWN);
@@ -288,28 +293,30 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
-		if(selectedFile != 0) {     // PIECE IS SELECTED
-			int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
-			int moveType = possMoves[clickedRank][clickedFile];
-			if(moveType != 0) {          // PERFORM VALID MOVE
-				doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
-				selectedRank = 0;
-				selectedFile = 0;
-			} else if(grid[selectedRank][selectedFile].teamColor ==
-					grid[clickedRank][clickedFile].teamColor) {     // SWITCH SELECTED PIECE
-				selectedRank = clickedRank;
-				selectedFile = clickedFile;
-			} else {                                                // DESELECT PIECE
-				selectedRank = 0;
-				selectedFile = 0;
-			}
-		} else {                    // NOTHING SELECTED
-			if(whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.WHITE) {
-				selectedRank = clickedRank;
-				selectedFile = clickedFile;
-			} else if(!whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.BLACK) {
-				selectedRank = clickedRank;
-				selectedFile = clickedFile;
+		if(clickedRank >= 1 && clickedRank <= 8 && clickedFile >= 1 && clickedFile <= 8) {
+			if(selectedFile != 0) {     // PIECE IS SELECTED
+				int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
+				int moveType = possMoves[clickedRank][clickedFile];
+				if(moveType != 0) {          // PERFORM VALID MOVE
+					doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
+					selectedRank = 0;
+					selectedFile = 0;
+				} else if(grid[selectedRank][selectedFile].teamColor ==
+						grid[clickedRank][clickedFile].teamColor) {     // SWITCH SELECTED PIECE
+					selectedRank = clickedRank;
+					selectedFile = clickedFile;
+				} else {                                                // DESELECT PIECE
+					selectedRank = 0;
+					selectedFile = 0;
+				}
+			} else {                    // NOTHING SELECTED
+				if(whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.WHITE) {
+					selectedRank = clickedRank;
+					selectedFile = clickedFile;
+				} else if(!whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.BLACK) {
+					selectedRank = clickedRank;
+					selectedFile = clickedFile;
+				}
 			}
 		}
 		repaint();

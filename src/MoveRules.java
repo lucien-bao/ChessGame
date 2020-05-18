@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.15
+ * @version 0.9.16
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -348,12 +348,15 @@ abstract class MoveRules {
 					(board[rank][file + 3].type == Piece.WHITE_ROOK ||
 							board[rank][file + 3].type == Piece.BLACK_ROOK) &&
 					board[rank][file + 3].teamColor == kingColor &&
-					!board[rank][file + 3].hasMoved &&
-					!isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
-					!isSquareAttacked(board, rank, file + 1, whiteToMove, doneMoveStack) &&
-					!isSquareAttacked(board, rank, file + 2, whiteToMove, doneMoveStack)
-			) {
-				possibleMoves[rank][file + 2] = 3;
+					!board[rank][file + 3].hasMoved) {
+			    if(isKingWhite == whiteToMove) {
+                    if(     !isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
+                            !isSquareAttacked(board, rank, file + 1, whiteToMove, doneMoveStack) &&
+                            !isSquareAttacked(board, rank, file + 2, whiteToMove, doneMoveStack)) {
+                        possibleMoves[rank][file + 2] = 3;
+                    }
+                } else
+				    possibleMoves[rank][file + 2] = 3;
 			}
 			// Queenside
 			// Kingside
@@ -362,12 +365,15 @@ abstract class MoveRules {
 					(board[rank][file - 4].type == Piece.WHITE_ROOK ||
 							board[rank][file - 4].type == Piece.BLACK_ROOK) &&
 					board[rank][file - 4].teamColor == kingColor &&
-					!board[rank][file - 4].hasMoved &&
-					!isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
-					!isSquareAttacked(board, rank, file - 1, whiteToMove, doneMoveStack) &&
-					!isSquareAttacked(board, rank, file - 2, whiteToMove, doneMoveStack)
-			) {
-				possibleMoves[rank][file - 2] = 3;
+					!board[rank][file - 4].hasMoved) {
+			    if(isKingWhite == whiteToMove) {
+			        if(     !isSquareAttacked(board, rank, file, whiteToMove, doneMoveStack) &&
+                            !isSquareAttacked(board, rank, file - 1, whiteToMove, doneMoveStack) &&
+                            !isSquareAttacked(board, rank, file - 2, whiteToMove, doneMoveStack)) {
+			            possibleMoves[rank][file - 2] = 3;
+                    }
+                } else
+				    possibleMoves[rank][file - 2] = 3;
 			}
 		}
 

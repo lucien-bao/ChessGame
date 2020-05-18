@@ -1,14 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.3
+ * @version 0.9.4
  * @since 4 APR 2020
  */
-public class InfoPanel extends JPanel {
+public class InfoPanel extends JPanel implements ActionListener {
 	// CONSTANTS
 	final int BACKGROUND_OPAQUE     = Color.HSBtoRGB(0, 0, 0.5f);
 	final float BACKGROUND_ALPHA    = 0.5f;
@@ -18,13 +20,20 @@ public class InfoPanel extends JPanel {
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
+	JButton newGame;
+	BoardPanel boardPanel;
 	
 	// FIELDS
 	int width, height;
 	
 	// CONSTRUCTOR
-	InfoPanel() {
+	InfoPanel(BoardPanel boardPanel) {
 		this.setOpaque(false);
+		newGame = new JButton("New Game");
+		newGame.addActionListener(this);
+		newGame.setActionCommand("new game");
+		this.add(newGame);
+		this.boardPanel = boardPanel;
 	}
 	
 	// METHODS
@@ -48,5 +57,13 @@ public class InfoPanel extends JPanel {
 		
 		graphics2d.setColor(BACKGROUND_COLOR);
 		graphics2d.fillRect(0, 0, width, height);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand().equals("new game")) {
+			boardPanel.setBoard();
+			boardPanel.repaint();
+		}
 	}
 }
