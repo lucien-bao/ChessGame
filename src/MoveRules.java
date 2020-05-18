@@ -36,22 +36,47 @@ abstract class MoveRules {
 		int pieceType = toMove.type;
 		if(pieceType > 6)
 			pieceType -= 6;
+		int[][] possibleMoves;
 		switch(pieceType) {
 			case 1:
-				return getPawnMoves(board, pieceRank, pieceFile, doneMoveStack, whiteToMove);
+				possibleMoves = getPawnMoves(board, pieceRank, pieceFile, doneMoveStack);
+				break;
 			case 2:
-				return getBishopMoves(board, pieceRank, pieceFile, whiteToMove);
+                possibleMoves = getBishopMoves(board, pieceRank, pieceFile);
+                break;
 			case 3:
-				return getKnightMoves(board, pieceRank, pieceFile, whiteToMove);
+                possibleMoves = getKnightMoves(board, pieceRank, pieceFile);
+                break;
 			case 4:
-				return getRookMoves(board, pieceRank, pieceFile, whiteToMove);
+                possibleMoves = getRookMoves(board, pieceRank, pieceFile);
+                break;
 			case 5:
-				return getQueenMoves(board, pieceRank, pieceFile, whiteToMove);
+                possibleMoves = getQueenMoves(board, pieceRank, pieceFile);
+                break;
 			case 6:
-				return getKingMoves(board, pieceRank, pieceFile, doneMoveStack, whiteToMove);
+                possibleMoves = getKingMoves(board, pieceRank, pieceFile, doneMoveStack, whiteToMove);
+                break;
 			default:
-				return new int[10][10];
+                possibleMoves = new int[10][10];
 		}
+
+		// check if king is attacked after each move
+        boolean pieceColorWhite;
+        pieceColorWhite = board[pieceRank][pieceFile].teamColor == Piece.WHITE;
+		if(whiteToMove == pieceColorWhite) { // only check if it's that side's move
+            for(int rank = 1; rank <= 8; rank++) {
+                for(int file = 1; file <= 8; file++) {
+                    if(possibleMoves[rank][file] > 0) {
+                        Piece[][] boardAfterMove = getBoardAfterMove(board, pieceRank, pieceFile, rank, file, possibleMoves[rank][file]);
+                        boolean validMove = !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack);
+                        if(!validMove)
+                            possibleMoves[rank][file] = 0;
+                    }
+                }
+            }
+		}
+
+		return possibleMoves;
 	}
 
 	/**
@@ -60,46 +85,30 @@ abstract class MoveRules {
 	 * @param rank the rank of the pawn
 	 * @param file the file of the pawn
 	 * @param doneMoveStack all completed moves
-	 * @param whiteToMove the team to move
 	 * @return the possible doneMoveStack of the pawn
 
 	 */
-	static int[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
+	static int[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack) {
 		int[][] possibleMoves = new int[10][10];
 		int pawnColor = board[rank][file].teamColor;
-		boolean isPawnWhite = (pawnColor == Piece.WHITE);
-		boolean pawnsMove;
-		if(isPawnWhite == whiteToMove)
-			pawnsMove = true;
-		else
-			pawnsMove = false;
 		// Separate the diff. color pawns b/c they move in opposite directions
 		if(pawnColor == Piece.BLACK) {
 			// Forward movement
 			if(board[rank + 1][file].teamColor == Piece.EMPTY) {
 				// Default 1-square step
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank + 1, file, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-					possibleMoves[rank + 1][file] = 1;
+                possibleMoves[rank + 1][file] = 1;
 				// Starting position 2-step
-				boardAfterMove = getBoardAfterMove(board, rank, file, rank + 2, file, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack)) {
-					if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY)
-						possibleMoves[rank + 2][file] = 1;
+                if(rank == 2 && board[rank + 2][file].teamColor == Piece.EMPTY)
+                    possibleMoves[rank + 2][file] = 1;
 				}
-			}
 			// Diag. capture, Southwest
 			if(file != 1 && board[rank + 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file - 1].teamColor) {
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank + 1, file - 1, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
 					possibleMoves[rank + 1][file - 1] = 1;
 			}
 			// Diag. capture, Southeast
 			if(file != 8 && board[rank + 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank + 1][file + 1].teamColor) {
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank + 1, file + 1, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
 					possibleMoves[rank + 1][file + 1] = 1;
 			}
 
@@ -114,9 +123,7 @@ abstract class MoveRules {
 							board[rank+2][file-1].type == Piece.EMPTY &&
 							board[rank+1][file-1].type == Piece.EMPTY &&
 							lastBoard[rank+2][file-1].type == Piece.WHITE_PAWN) {
-						Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank + 1, file - 1, 2);
-						if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-							possibleMoves[rank+1][file-1] = 2;
+					    possibleMoves[rank+1][file-1] = 2;
 					}
 					// Capture down and right
 					else if(file != 8 &&
@@ -124,9 +131,7 @@ abstract class MoveRules {
 							board[rank+2][file+1].type == Piece.EMPTY &&
 							board[rank+1][file+1].type == Piece.EMPTY &&
 							lastBoard[rank+2][file+1].type == Piece.WHITE_PAWN) {
-						Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank + 1, file + 1, 2);
-						if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-							possibleMoves[rank+1][file+1] = 2;
+					    possibleMoves[rank+1][file+1] = 2;
 					}
 				}
 			}
@@ -136,28 +141,19 @@ abstract class MoveRules {
 			// Forward movement
 			if(board[rank - 1][file].teamColor == Piece.EMPTY) {
 				// Default 1-square step
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank - 1, file, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-					possibleMoves[rank - 1][file] = 1;
+                possibleMoves[rank - 1][file] = 1;
 				// Starting position 2-step
-				boardAfterMove = getBoardAfterMove(board, rank, file, rank - 2, file, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack)) {
-					if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY)
-						possibleMoves[rank - 2][file] = 1;
+                if(rank == 7 && board[rank - 2][file].teamColor == Piece.EMPTY)
+                    possibleMoves[rank - 2][file] = 1;
 				}
-			}
 			// Diag. capture, Northwest
 			if(file != 1 && board[rank - 1][file - 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file - 1].teamColor) {
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank - 1, file - 1, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
 					possibleMoves[rank - 1][file - 1] = 1;
 			}
 			// Diag. capture, Northeast
 			if(file != 8 && board[rank - 1][file + 1].teamColor != Piece.EMPTY
 					&& pawnColor != board[rank - 1][file + 1].teamColor) {
-				Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank - 1, file - 1, 1);
-				if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
 					possibleMoves[rank - 1][file + 1] = 1;
 			}
 
@@ -171,9 +167,7 @@ abstract class MoveRules {
 						board[rank-1][file-1].type == Piece.EMPTY &&            // Square to move
 						blackLastBoard[rank-2][file-1].type == Piece.BLACK_PAWN // Last move by Black
 				) {
-					Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank - 1, file - 1, 2);
-					if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-						possibleMoves[rank-1][file-1] = 2;
+				    possibleMoves[rank-1][file-1] = 2;
 				}
 				// Capture down and right
 				else if(file != 8 &&
@@ -182,9 +176,7 @@ abstract class MoveRules {
 						board[rank-1][file+1].type == Piece.EMPTY &&
 						blackLastBoard[rank-2][file+1].type == Piece.BLACK_PAWN
 				) {
-					Piece[][] boardAfterMove = getBoardAfterMove(board, rank, file, rank - 1, file + 1, 2);
-					if(!pawnsMove || !isKingCheckedAfterMove(boardAfterMove, whiteToMove, doneMoveStack))
-						possibleMoves[rank-1][file+1] = 2;
+				    possibleMoves[rank-1][file+1] = 2;
 				}
 				
 				doneMoveStack.push(new State(blackLastBoard));
@@ -198,10 +190,9 @@ abstract class MoveRules {
 	 * @param board the current pieces on the board
 	 * @param rank the rank of the knight
 	 * @param file the file of the knight
-	 * @param whiteToMove the team to move
 	 * @return the possible doneMoveStack of the knight
 	 */
-	static int[][] getKnightMoves(Piece[][] board, int rank, int file, boolean whiteToMove) {
+	static int[][] getKnightMoves(Piece[][] board, int rank, int file) {
 		int[][] possibleMoves = new int[10][10];
 		int knightColor = board[rank][file].teamColor;
 		int[] xOffsets = new int[] {-2, -2, -1, -1, +1, +1, +2, +2};
@@ -223,10 +214,9 @@ abstract class MoveRules {
 	 * @param board the current pieces on the board
 	 * @param rank the rank of the bishop
 	 * @param file the file of the bishop
-	 * @param whiteToMove the team to move
 	 * @return the possible doneMoveStack of the bishop
 	 */
-	static int[][] getBishopMoves(Piece[][] board, int rank, int file, boolean whiteToMove) {
+	static int[][] getBishopMoves(Piece[][] board, int rank, int file) {
 		int[][] possibleMoves = new int[10][10];
 
 		int rankTo;
@@ -262,10 +252,9 @@ abstract class MoveRules {
      * @param board the current pieces on the board
      * @param rank the rank of the rook
      * @param file the file of the rook
-	 * @param whiteToMove the team to move
      * @return the possible doneMoveStack of the rook
      */
-    static int[][] getRookMoves(Piece[][] board, int rank, int file, boolean whiteToMove) {
+    static int[][] getRookMoves(Piece[][] board, int rank, int file) {
         int[][] possibleMoves = new int[10][10];
 
         int rankTo;
@@ -301,13 +290,12 @@ abstract class MoveRules {
      * @param board the current pieces on the board
      * @param rank the rank of the queen
      * @param file the file of the queen
-	 * @param whiteToMove the team to move
      * @return the possible doneMoveStack of the queen
      */
-    static int[][] getQueenMoves(Piece[][] board, int rank, int file, boolean whiteToMove) {
+    static int[][] getQueenMoves(Piece[][] board, int rank, int file) {
         int[][] possibleMoves = new int[10][10];
-        int[][] bishopMoves   = getBishopMoves(board, rank, file, whiteToMove);
-        int[][] rookMoves     = getRookMoves(board, rank, file, whiteToMove);
+        int[][] bishopMoves   = getBishopMoves(board, rank, file);
+        int[][] rookMoves     = getRookMoves(board, rank, file);
         for(int rankTo = 1; rankTo <= 8; rankTo++)
             for(int fileTo = 1; fileTo <= 8; fileTo++)
             	possibleMoves[rankTo][fileTo] = bishopMoves[rankTo][fileTo] + rookMoves[rankTo][fileTo];
@@ -418,7 +406,8 @@ abstract class MoveRules {
 	 * @return whether the king is checked
 	 */
 	static boolean isKingCheckedAfterMove(Piece[][] boardAfterMove, boolean whiteToMove, ArrayDeque<State> doneMoveStack) {
-    	if(whiteToMove) { // is white's king in check after potential white move
+    	boolean kingChecked;
+	    if(whiteToMove) { // is white's king in check after potential white move
 			int kingRank = 0;
 			int kingFile = 0;
     		for(int rank = 1; rank <= 8; rank++) {
@@ -429,7 +418,7 @@ abstract class MoveRules {
 					}
 				}
 			}
-    		boolean kingChecked = isSquareAttacked(boardAfterMove, kingRank, kingFile, whiteToMove, doneMoveStack);
+    		kingChecked = isSquareAttacked(boardAfterMove, kingRank, kingFile, whiteToMove, doneMoveStack);
 		} else { // black king
 			int kingRank = 0;
 			int kingFile = 0;
@@ -441,9 +430,9 @@ abstract class MoveRules {
 					}
 				}
 			}
-			boolean kingChecked = isSquareAttacked(boardAfterMove, kingRank, kingFile, whiteToMove, doneMoveStack);
+			kingChecked = isSquareAttacked(boardAfterMove, kingRank, kingFile, whiteToMove, doneMoveStack);
 		}
-    	return false;
+    	return kingChecked;
 	}
 
 	/**
