@@ -63,6 +63,7 @@ public class InfoPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("new game")) {
 			boardPanel.setBoard();
+			boardPanel.checkmateStatus = 0;
 			boardPanel.repaint();
 		}
 	}

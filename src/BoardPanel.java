@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.18
+ * @version 0.9.19
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -40,6 +40,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	int outsideGrid; // Amount of excess length outside the drawn grid (due to int truncation).
 	int selectedRank;
 	int selectedFile;
+	int checkmateStatus;
 	boolean whiteToMove;
 	
 	int set; // This is the chess set (i.e., what the pieces look like) to use
@@ -67,6 +68,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         selectedFile = 0;
         
         whiteToMove = true;
+        checkmateStatus = 0; // 0 is neither team, 1 is white, 2 is black
         
         doneMoveStack = new ArrayDeque<>();
         undoneMoveStack = new ArrayDeque<>();
@@ -117,6 +119,11 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		}
 		grid[endRank][endFile].hasMoved = true;
 		whiteToMove = !whiteToMove;
+		boolean isCheckmate = MoveRules.isCheckmate(grid, doneMoveStack, whiteToMove);
+		if(whiteToMove && isCheckmate) // white has been checkmated
+			checkmateStatus = Piece.BLACK;
+		else if(isCheckmate)
+			checkmateStatus = Piece.WHITE;
 	}
 	
 	/**
@@ -223,6 +230,15 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 							outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
 							outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
 							squareSize / 2, squareSize / 2);
+
+		// TODO: find a better way to display checkmate
+		graphics2d.setColor(Color.BLACK);
+		graphics2d.setFont(new Font("cool font", Font.PLAIN, 50));
+		if(checkmateStatus == Piece.WHITE) { // white has checkmated black
+			graphics2d.drawString("White wins", squareSize, squareSize * 4);
+		} else if(checkmateStatus == Piece.BLACK) {
+			graphics2d.drawString("Black wins", squareSize, squareSize * 4);
+		}
 	}
 	
 	/**
