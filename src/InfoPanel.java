@@ -7,10 +7,10 @@ import java.awt.event.ActionListener;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.4
+ * @version 0.9.5
  * @since 4 APR 2020
  */
-public class InfoPanel extends JPanel implements ActionListener {
+public class InfoPanel extends JPanel implements ActionListener, BoardStateListener {
 	// CONSTANTS
 	final int BACKGROUND_OPAQUE     = Color.HSBtoRGB(0, 0, 0.5f);
 	final float BACKGROUND_ALPHA    = 0.5f;
@@ -20,20 +20,26 @@ public class InfoPanel extends JPanel implements ActionListener {
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
-	JButton newGame;
+	JButton newGameButton;
 	BoardPanel boardPanel;
 	
 	// FIELDS
 	int width, height;
+	int checkmateStatus; // 0 is none, 1 is white, 2 is black
+	int stalemateStatus;
+	JLabel gameOverLabel;
 	
 	// CONSTRUCTOR
 	InfoPanel(BoardPanel boardPanel) {
 		this.setOpaque(false);
-		newGame = new JButton("New Game");
-		newGame.addActionListener(this);
-		newGame.setActionCommand("new game");
-		this.add(newGame);
+		newGameButton = new JButton("New Game");
+		newGameButton.addActionListener(this);
+		this.add(newGameButton);
 		this.boardPanel = boardPanel;
+		this.checkmateStatus = 0;
+		this.stalemateStatus = 0;
+		gameOverLabel = new JLabel("");
+		this.add(gameOverLabel);
 	}
 	
 	// METHODS
@@ -57,14 +63,33 @@ public class InfoPanel extends JPanel implements ActionListener {
 		
 		graphics2d.setColor(BACKGROUND_COLOR);
 		graphics2d.fillRect(0, 0, width, height);
+
+		graphics2d.setColor(Color.BLACK);
+		if(checkmateStatus == 1)
+			gameOverLabel.setText("White wins");
+		else if(checkmateStatus == 2)
+			gameOverLabel.setText("Black wins");
+		else if(stalemateStatus != 0)
+			gameOverLabel.setText("Draw by stalemate");
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals("new game")) {
+		if(e.getSource() == newGameButton) {
 			boardPanel.setBoard();
 			boardPanel.checkmateStatus = 0;
+			boardPanel.stalemateStatus = 0;
+			checkmateStatus = 0;
+			stalemateStatus = 0;
+			gameOverLabel.setText("");
 			boardPanel.repaint();
 		}
+	}
+
+	@Override
+	public void gameIsOver() {
+		this.checkmateStatus = boardPanel.checkmateStatus;
+		this.stalemateStatus = boardPanel.stalemateStatus;
+		this.repaint();
 	}
 }

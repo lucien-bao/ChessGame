@@ -479,12 +479,23 @@ abstract class MoveRules {
 		return newBoard;
 	}
 
+    /**
+     * Detects whether one side has checkmated
+     * @param board the current board state
+     * @param doneMoveStack all completed moves
+     * @param whiteToMove which side moves next
+     * @return whether one side has checkmated
+     */
 	static boolean isCheckmate(Piece[][] board, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
 	    int sideToMove;
 	    if(whiteToMove)
 	        sideToMove = Piece.WHITE;
 	    else
 	        sideToMove = Piece.BLACK;
+
+        boolean kingAttacked = isKingCheckedAfterMove(board, whiteToMove, doneMoveStack);
+        if(!kingAttacked)
+            return false;
 
 	    // for each piece of the side to move: get its possible moves, and if it has any, it's not checkmate
 	    for(int rank = 1; rank <= 8; rank++) {
@@ -503,5 +514,42 @@ abstract class MoveRules {
         }
 
 	    return true;
+    }
+
+    /**
+     * Detects whether one side has stalemated
+     * @param board the current board state
+     * @param doneMoveStack all completed moves
+     * @param whiteToMove which side moves next
+     * @return whether one side has stalemated
+     */
+    static boolean isStalemate(Piece[][] board, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
+        int sideToMove;
+        if(whiteToMove)
+            sideToMove = Piece.WHITE;
+        else
+            sideToMove = Piece.BLACK;
+
+        boolean kingAttacked = isKingCheckedAfterMove(board, whiteToMove, doneMoveStack);
+        if(kingAttacked)
+            return false;
+
+        // for each piece of the side to move: get its possible moves, and if it has any, it's not checkmate
+        for(int rank = 1; rank <= 8; rank++) {
+            for(int file = 1; file <= 8; file++) {
+                if(board[rank][file].teamColor == sideToMove) {
+                    int[][] possibleMoves = getPossMoves(board, rank, file, doneMoveStack, whiteToMove);
+                    for(int r = 1; r <= 8; r++) {
+                        for(int f = 1; f <= 8; f++) {
+                            if(possibleMoves[r][f] > 0) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

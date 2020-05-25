@@ -9,7 +9,7 @@ import java.io.*;
  * <code>Frame</code> class. This represents the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.11
+ * @version 0.9.12
  * @since 4 APR 2020
  */
 class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
@@ -75,7 +75,8 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		backgroundPanel = new BackgroundPanel();
 		backgroundPanel.setBounds(0, 0, 800, 500);
 		this.add(backgroundPanel);
-		
+
+		boardPanel.addListener(infoPanel);
 		// Misc. setup
 		this.setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT + MENU_BAR_HEIGHT));
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT + MENU_BAR_HEIGHT));

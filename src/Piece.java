@@ -1,5 +1,3 @@
-import org.omg.PortableInterceptor.*;
-
 import javax.imageio.*;
 import java.awt.image.*;
 import java.io.*;
