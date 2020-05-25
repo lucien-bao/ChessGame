@@ -8,25 +8,30 @@ import java.io.*;
  * <code>BackgroundPanel</code> class. Displays the background image.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.2
+ * @version 0.9.3
  * @since 22 APR 2020
  */
 public class BackgroundPanel extends JPanel {
-	// CONSTANTS
-	double imageRatio = 1440 / 900.0; // Ideal_Width / Ideal_Height [i.e. screen dimensions]
+	// CONSTANTS //
+	// Ideal_Width/Ideal_Height [i.e. screen dimensions]
+	double imageRatio = 1440 / 900.0;
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
 	
-	// IMAGES
+	// IMAGES //
 	BufferedImage background;
 	
-	// FIELDS
+	// FIELDS //
 	int imageWidth, imageHeight;
 	int panelWidth, panelHeight;
 	
 	// CONSTRUCTOR
+	
+	/**
+	 * Default constructor.
+	 */
 	BackgroundPanel() {
 		try {
 			File backgroundFile = new File("img/background.png");
@@ -37,7 +42,12 @@ public class BackgroundPanel extends JPanel {
 		}
 	}
 	
-	// METHODS
+	// METHODS //
+	
+	/**
+	 * Repaints the background, accounting for differences in aspect ratio and size.
+	 * @param graphics <code>Graphics</code> instance used to draw.
+	 */
 	@Override
 	protected void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
@@ -53,10 +63,10 @@ public class BackgroundPanel extends JPanel {
 	}
 	
 	/**
-	 * Resizes the panel to the specified size
+	 * Resizes the panel to the specified size.
 	 *
-	 * @param width  the new width to use
-	 * @param height the new height to use
+	 * @param width The new width to use.
+	 * @param height The new height to use.
 	 */
 	void changeSize(int width, int height) {
 		this.panelWidth  = width;

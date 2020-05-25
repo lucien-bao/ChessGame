@@ -2,14 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * <code>PlayerPanel</code> class. This displays information for a specific player.
+ * <code>PlayerPanel</code> class. This displays information about a specific player.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.3
+ * @version 0.9.4
  * @since 4 APR 2020
  */
 public class PlayerPanel extends JPanel {
-	// FIELDS
+	// FIELDS //
 	int width, height;
 	boolean isWhite;
 	int BACKGROUND_OPAQUE;
@@ -21,7 +21,12 @@ public class PlayerPanel extends JPanel {
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
 	
-	// CONSTRUCTOR
+	// CONSTRUCTOR //
+	
+	/**
+	 * Creates a <code>PlayerPanel</code> based on color.
+	 * @param isWhite The color to use.
+	 */
 	PlayerPanel(boolean isWhite) {
 		this.setOpaque(false);
 		this.isWhite = isWhite;
@@ -34,19 +39,23 @@ public class PlayerPanel extends JPanel {
 		BACKGROUND_COLOR    = new Color(BACKGROUND_RGBA, true);
 	}
 	
-	// METHODS
+	// METHODS //
 	
 	/**
-	 * Resizes the panel to the specified size
+	 * Resizes the panel to the specified size.
 	 *
-	 * @param width  the new width to use
-	 * @param height the new height to use
+	 * @param width The new width to use.
+	 * @param height The new height to use.
 	 */
 	void changeSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
 	
+	/**
+	 * Repaints this instance.
+	 * @param graphics The <code>Graphics</code> instance used to draw.
+	 */
 	@Override
 	protected void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);

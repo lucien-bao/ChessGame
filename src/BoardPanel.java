@@ -7,11 +7,11 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.20
+ * @version 0.9.21
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
-	// CONSTANTS
+	// CONSTANTS //
 	
 	// How to get RGBA from int:
 	// take the last 24 bits, then concatenate the alpha value at the front,
@@ -33,11 +33,13 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	final RenderingHints RENDERING_HINTS;
 	
-	// FIELDS
+	// FIELDS //
 	Piece[][] grid;
-	int length; // JPanel dimensions. Represents both because it's a square.
+	// JPanel dimensions. Represents both because it's a square.
+	int length;
 	int squareSize;
-	int outsideGrid; // Amount of excess length outside the drawn grid (due to int truncation).
+	// Amount of excess length outside the drawn grid (due to int truncation and division).
+	int outsideGrid;
 	int selectedRank;
 	int selectedFile;
 	int checkmateStatus;
@@ -45,19 +47,26 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	boolean whiteToMove;
 	HashSet<BoardStateListener> listenerSet;
 	
-	int set; // This is the chess set (i.e., what the pieces look like) to use
+	// This is the chess set (i.e., what the pieces look like) to use.
+	int set;
 
 	ArrayDeque<State> doneMoveStack;
 	ArrayDeque<State> undoneMoveStack;
 	
-	// CONSTRUCTORS
+	// CONSTRUCTORS //
+	
+	/**
+	 * Default constructor.
+	 */
 	BoardPanel() {
 		// Forces Java to recognize drawing of panels beneath this one (i.e. BackgroundPanel)
 		this.setOpaque(false);
 		addMouseListener(this);
 		
-		RENDERING_HINTS = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		RENDERING_HINTS.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		RENDERING_HINTS = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		RENDERING_HINTS.put(RenderingHints.KEY_INTERPOLATION,
+				RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		
 		set = 0;
 		
@@ -79,21 +88,20 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         listenerSet = new HashSet<>();
 	}
 	
-	// METHODS
+	// METHODS //
 
 	/**
-	 * Adds a new listener to the hash set
-	 * @param bSL the listener to add
+	 * Adds a new <code>BoardStateListener</code> to the internal <code>HashSet</code>.
+	 * @param bSL The <code>BoardStateListener</code> to add.
 	 */
 	void addListener(BoardStateListener bSL) {
 		listenerSet.add(bSL);
 	}
 
-
 	/**
 	 * Resizes the panel to the specified length
 	 *
-	 * @param length the new length to use
+	 * @param length The new length to use.
 	 */
 	void changeLength(int length) {
 		this.length = length;
@@ -102,12 +110,12 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Moves a piece from the starting square to the ending square
+	 * Moves a piece from the starting square to the ending square.
 	 *
-	 * @param startFile the original file of the piece
-	 * @param startRank the original rank of the piece
-	 * @param endFile   the new file of the piece
-	 * @param endRank   the new rank of the piece
+	 * @param startFile The original file of the piece.
+	 * @param startRank The original rank of the piece.
+	 * @param endFile The new file of the piece.
+	 * @param endRank The new rank of the piece.
 	 */
 	void doMove(int startRank, int startFile, int endRank, int endFile, int moveType) {
 		Piece[][] gridCopy = new Piece[10][10];
@@ -168,9 +176,9 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Automatically called by repaint(), draws everything
+	 * Automatically called by <code>repaint()</code>, draws everything.
 	 *
-	 * @param graphics the Graphics object used to draw
+	 * @param graphics The <code>Graphics</code> object instance used to draw.
 	 */
 	public void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
@@ -254,7 +262,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		if(checkmateStatus != 0 || stalemateStatus != 0)
 			notifyListeners();
 	}
-
+	
+	/**
+	 * Notifyes any associated <code>BoardStateListeners</code> of check-/stalemate.
+	 */
 	void notifyListeners() {
 		for(BoardStateListener bSL : listenerSet) {
 			bSL.gameIsOver();
@@ -262,7 +273,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Add letter/number squares, set all other pieces to <code>Piece.EMPTY</code>
+	 * Adds letter/number squares and sets all other pieces to <code>Piece.EMPTY</code>.
 	 */
 	private void addLabels() {
 		for(int rank = 0; rank <= 9; rank++) {
@@ -277,7 +288,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Sets the board to the default arrangement.
+	 * Sets the board to the starting position.
 	 */
 	void setBoard() {
 		whiteToMove = true;
@@ -314,6 +325,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		}
 	}
 	
+	/**
+	 * Processes mouse-clicking events.
+	 * @param e The <code>MouseEvent</code> given by the event thread.
+	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		/*
@@ -357,23 +372,47 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		}
 		repaint();
 	}
-
+	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mousePressed(MouseEvent e) {}
-
+	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {}
-
+	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mouseEntered(MouseEvent e) {}
-
+	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
 	// TODO: alternate method of moving pieces
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mouseDragged(MouseEvent e) {}
 	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void mouseMoved(MouseEvent e) {}
 }

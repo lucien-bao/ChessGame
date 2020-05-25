@@ -1,19 +1,16 @@
-import javax.imageio.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
 
 /**
  * <code>Frame</code> class. This represents the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.12
+ * @version 0.9.13
  * @since 4 APR 2020
  */
 class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
-	// CONSTANTS
+	// CONSTANTS //
 	// TODO: make it automatically fullscreen,
 	//  and add a button to toggle fullscreen/not fullscreen
 	// TODO: draw one border around all the panels
@@ -28,7 +25,7 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 	// Proportions within this distance from the ideal proportion are acceptable
 	final float PROPORTION_BUFFER = 0.1f;
 	
-	// FIELDS
+	// FIELDS //
 	Dimension size = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	InfoPanel infoPanel;  // General info panel
 	BoardPanel boardPanel; // Chessboard panel
@@ -36,16 +33,16 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 	PlayerPanel whitePanel; // White player info panel
 	BackgroundPanel backgroundPanel; // Panel that displays background image
 	
-	// CONSTRUCTOR
+	// CONSTRUCTOR //
 	
 	/**
-	 * Constructor. Initiates all the <code>JPanels</code>.
+	 * Default constructors.
 	 */
 	public Frame() {
 		super("JChess");
 		
 		// Piece images
-		Piece.loadImages(this);
+		Piece.loadImages();
 		
 		// Resizing stuff
 		addComponentListener(this);
@@ -85,10 +82,10 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		this.setVisible(true);
 	}
 	
-	// METHODS
+	// METHODS //
 	
 	/**
-	 * Resizes the panels after the <code>JFrame</code> instance gets resized.
+	 * Resizes the panels after the window gets resized.
 	 */
 	void resizePanels() {
 		int width = size.width;
@@ -174,12 +171,12 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		infoPanel.repaint();
 	}
 	
-	// COMPONENTLISTER METHODS
+	// COMPONENTLISTER METHODS //
 	
 	/**
 	 * Changes the <code>size</code> field when the window gets resized
 	 *
-	 * @param e the event passed to this methods on resizing
+	 * @param e The ComponentEvent passed to this method on resizing
 	 */
 	@Override
 	public void componentResized(ComponentEvent e) {
@@ -188,36 +185,50 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		resizePanels();
 	}
 	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void componentMoved(ComponentEvent e) {
 	}
 	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void componentShown(ComponentEvent e) {
 	}
 	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void componentHidden(ComponentEvent e) {
 	}
 	
-//	// MOUSELISTENER METHODS
-//	@Override
-//	public void mouseClicked(MouseEvent mouseEvent) {
-//	}
-//	
-//	@Override
-//	public void mousePressed(MouseEvent mouseEvent) {
-//	}
-//	
-//	@Override
-//	public void mouseReleased(MouseEvent mouseEvent) {
-//	}
-//	
-//	@Override
-//	public void mouseEntered(MouseEvent mouseEvent) {
-//	}
-//	
-//	@Override
-//	public void mouseExited(MouseEvent mouseEvent) {
-//	}
+	/*
+	// MOUSELISTENER METHODS //
+	@Override
+	public void mouseClicked(MouseEvent mouseEvent) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent mouseEvent) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent mouseEvent) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent mouseEvent) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent mouseEvent) {
+	}
+	 */
 }

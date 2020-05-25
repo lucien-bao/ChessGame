@@ -1,13 +1,12 @@
 import javax.imageio.*;
 import java.awt.image.*;
 import java.io.*;
-import java.nio.*;
 
 /**
  * <code>Piece</code> class. Types of pieces and their possible doneMoveStack.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.7
+ * @version 0.9.8
  * @since 4 APR 2020
  */
 class Piece {
@@ -50,17 +49,22 @@ class Piece {
 	static final String[] NAMES = {"Classics", "Letters"};
 	static final int NUM_SETS = 2;
 	
-	// IMAGES 
+	// IMAGES //
 	static BufferedImage[][] pieces; // 1st index -> set, 2nd index -> type
 	// indexes are the same as associated constants
 	static BufferedImage[] labels;
 	
-	// FIELDS
+	// FIELDS //
 	int teamColor;
 	int type;
 	boolean hasMoved;
 	
 	// CONSTRUCTORS //
+	
+	/**
+	 * Creates a new <code>Piece</code> instance based on piece type.
+	 * @param type The type <code>Pice</code> to make
+	 */
 	Piece(int type) {
 		this.type = type;
 		if(type == 0)
@@ -73,7 +77,11 @@ class Piece {
 	}
 	
 	// METHODS //
-	static void loadImages(Frame frame) {
+	
+	/**
+	 * Loads images into the arrays.
+	 */
+	static void loadImages() {
 		int loaded = 0;
 		int total = 40;
 		// Chess sets

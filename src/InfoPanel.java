@@ -7,11 +7,11 @@ import java.awt.event.ActionListener;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.5
+ * @version 0.9.6
  * @since 4 APR 2020
  */
 public class InfoPanel extends JPanel implements ActionListener, BoardStateListener {
-	// CONSTANTS
+	// CONSTANTS //
 	final int BACKGROUND_OPAQUE     = Color.HSBtoRGB(0, 0, 0.5f);
 	final float BACKGROUND_ALPHA    = 0.5f;
 	final int BACKGROUND_RGBA       = (BACKGROUND_OPAQUE & 16777215) | ((int) (BACKGROUND_ALPHA*255) << 24);
@@ -23,13 +23,18 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	JButton newGameButton;
 	BoardPanel boardPanel;
 	
-	// FIELDS
+	// FIELDS //
 	int width, height;
 	int checkmateStatus; // 0 is none, 1 is white, 2 is black
 	int stalemateStatus;
 	JLabel gameOverLabel;
 	
-	// CONSTRUCTOR
+	// CONSTRUCTOR //
+	
+	/**
+	 * Default constructor. Recieves a <code>BoardPanel</code> instance to access info about the game.
+	 * @param boardPanel The <code>BoardPanel</code> instance from <code>Frame</code>.
+	 */
 	InfoPanel(BoardPanel boardPanel) {
 		this.setOpaque(false);
 		newGameButton = new JButton("New Game");
@@ -42,19 +47,23 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 		this.add(gameOverLabel);
 	}
 	
-	// METHODS
+	// METHODS //
 	
 	/**
-	 * Resizes the panel to the specified size
+	 * Resizes the panel to the specified size.
 	 *
-	 * @param width  the new width to use
-	 * @param height the new height to use
+	 * @param width The new width to use.
+	 * @param height The new height to use.
 	 */
 	void changeSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
 	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
@@ -72,7 +81,11 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 		else if(stalemateStatus != 0)
 			gameOverLabel.setText("Draw by stalemate");
 	}
-
+	
+	/**
+	 * Not used.
+	 * @param e -
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == newGameButton) {
@@ -85,7 +98,10 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 			boardPanel.repaint();
 		}
 	}
-
+	
+	/**
+	 * Checks for check-/stalemate. Called by <code>BoardPanel</code>.
+	 */
 	@Override
 	public void gameIsOver() {
 		this.checkmateStatus = boardPanel.checkmateStatus;

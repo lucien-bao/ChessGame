@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
  * <code>MoveRules</code> class. This is not instantiated, only providing methods to determine if doneMoveStack are valid.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.17
+ * @version 0.9.18
  * @since 9 APR 2020
  */
 abstract class MoveRules {
@@ -22,14 +22,14 @@ abstract class MoveRules {
 	- Promotion
 	 */
 	/**
-	 * Gets possible doneMoveStack of a specific piece
+	 * Gets possible moves of a specific piece
 	 * Calls a specific helper method based on the piece type
-	 * @param board the current pieces on the board
-	 * @param pieceRank the rank of the piece to move
-	 * @param pieceFile the file of the piece to move
-	 * @param doneMoveStack all completed moves
-	 * @param whiteToMove the team to move
-	 * @return the possible doneMoveStack of the piece
+	 * @param board The current pieces on the board
+	 * @param pieceRank The rank of the piece to move
+	 * @param pieceFile The file of the piece to move
+	 * @param doneMoveStack All completed moves
+	 * @param whiteToMove The team to move
+	 * @return The possible moves of the piece
 	 */
 	static int[][] getPossMoves(Piece[][] board, int pieceRank, int pieceFile, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
 		Piece toMove = board[pieceRank][pieceFile];
@@ -60,7 +60,7 @@ abstract class MoveRules {
                 possibleMoves = new int[10][10];
 		}
 
-		// check if king is attacked after each move
+		// Check if king is attacked after each move
         boolean pieceColorWhite;
         pieceColorWhite = board[pieceRank][pieceFile].teamColor == Piece.WHITE;
 		if(whiteToMove == pieceColorWhite) { // only check if it's that side's move
@@ -80,12 +80,12 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible doneMoveStack of a pawn
-	 * @param board the current pieces on the board
-	 * @param rank the rank of the pawn
-	 * @param file the file of the pawn
-	 * @param doneMoveStack all completed moves
-	 * @return the possible doneMoveStack of the pawn
+	 * Finds possible moves of a pawn
+	 * @param board The current pieces on the board
+	 * @param rank The rank of the pawn
+	 * @param file The file of the pawn
+	 * @param doneMoveStack All completed moves
+	 * @return The possible moves of the pawn
 
 	 */
 	static int[][] getPawnMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack) {
@@ -186,11 +186,11 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible doneMoveStack of a knight
-	 * @param board the current pieces on the board
-	 * @param rank the rank of the knight
-	 * @param file the file of the knight
-	 * @return the possible doneMoveStack of the knight
+	 * Finds possible moves of a knight
+	 * @param board The current pieces on the board
+	 * @param rank The rank of the knight
+	 * @param file The file of the knight
+	 * @return The possible moves of the knight
 	 */
 	static int[][] getKnightMoves(Piece[][] board, int rank, int file) {
 		int[][] possibleMoves = new int[10][10];
@@ -210,11 +210,11 @@ abstract class MoveRules {
 	}
 
 	/**
-	 * Finds possible doneMoveStack of a bishop
-	 * @param board the current pieces on the board
-	 * @param rank the rank of the bishop
-	 * @param file the file of the bishop
-	 * @return the possible doneMoveStack of the bishop
+	 * Finds possible moves of a bishop
+	 * @param board The current pieces on the board
+	 * @param rank The rank of the bishop
+	 * @param file The file of the bishop
+	 * @return The possible moves of the bishop
 	 */
 	static int[][] getBishopMoves(Piece[][] board, int rank, int file) {
 		int[][] possibleMoves = new int[10][10];
@@ -248,11 +248,11 @@ abstract class MoveRules {
 	}
 
     /**
-     * Finds possible doneMoveStack of a rook
-     * @param board the current pieces on the board
-     * @param rank the rank of the rook
-     * @param file the file of the rook
-     * @return the possible doneMoveStack of the rook
+     * Finds possible moves of a rook
+     * @param board The current pieces on the board
+     * @param rank The rank of the rook
+     * @param file The file of the rook
+     * @return The possible moves of the rook
      */
     static int[][] getRookMoves(Piece[][] board, int rank, int file) {
         int[][] possibleMoves = new int[10][10];
@@ -286,11 +286,11 @@ abstract class MoveRules {
     }
 
     /**
-     * Finds possible doneMoveStack of a queen
-     * @param board the current pieces on the board
-     * @param rank the rank of the queen
-     * @param file the file of the queen
-     * @return the possible doneMoveStack of the queen
+     * Finds possible moves of a queen
+     * @param board The current pieces on the board
+     * @param rank The rank of the queen
+     * @param file The file of the queen
+     * @return The possible moves of the queen
      */
     static int[][] getQueenMoves(Piece[][] board, int rank, int file) {
         int[][] possibleMoves = new int[10][10];
@@ -303,13 +303,13 @@ abstract class MoveRules {
     }
 
     /**
-     * Finds possible doneMoveStack of a king
-     * @param board the current pieces on the board
-     * @param rank the rank of the king
-     * @param file the file of the king
-	 * @param doneMoveStack all completed moves
-	 * @param whiteToMove the team to move
-     * @return the possible doneMoveStack of the king
+     * Finds possible moves of a king
+     * @param board The current pieces on the board
+     * @param rank The rank of the king
+     * @param file The file of the king
+	 * @param doneMoveStack All completed moves
+	 * @param whiteToMove The team to move
+     * @return The possible moves of the king
      */
     static int[][] getKingMoves(Piece[][] board, int rank, int file, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
         int[][] possibleMoves = new int[10][10];
@@ -382,11 +382,11 @@ abstract class MoveRules {
 
 	/**
 	 * Checks whether a square is attacked
-	 * @param board the current board state
-	 * @param squareRank the rank of the square to check
-	 * @param squareFile the file of the square to check
-	 * @param whiteToMove which team moves next
-	 * @return whether the square is attacked
+	 * @param board The current board state
+	 * @param squareRank The rank of the square to check
+	 * @param squareFile The file of the square to check
+	 * @param whiteToMove Which team moves next
+	 * @return Whether the square is attacked
 	 */
     static boolean isSquareAttacked(Piece[][] board, int squareRank, int squareFile, boolean whiteToMove, ArrayDeque<State> doneMoveStack) {
     	for(int rank = 1; rank <= 8; rank++) {
@@ -406,10 +406,10 @@ abstract class MoveRules {
 
 	/**
 	 * Determines whether the king is checked after a particular move
-	 * @param boardAfterMove the board after the move
-	 * @param whiteToMove which team moves next
-	 * @param doneMoveStack all completed moves
-	 * @return whether the king is checked
+	 * @param boardAfterMove The board after the move
+	 * @param whiteToMove Which team moves next
+	 * @param doneMoveStack All completed moves
+	 * @return Whether the king is checked
 	 */
 	static boolean isKingCheckedAfterMove(Piece[][] boardAfterMove, boolean whiteToMove, ArrayDeque<State> doneMoveStack) {
     	boolean kingChecked;
@@ -443,21 +443,18 @@ abstract class MoveRules {
 
 	/**
 	 * Gets a board state after a move
-	 * @param oldBoard the board before the move
-	 * @param startRank the starting rank of the moving piece
-	 * @param startFile the starting file of the moving piece
-	 * @param endRank the final rank of the moving piece
-	 * @param endFile the final file of the moving piece
-	 * @param moveType what type
-	 * @return the board after the move
+	 * @param oldBoard The board before the move
+	 * @param startRank The starting rank of the moving piece
+	 * @param startFile The starting file of the moving piece
+	 * @param endRank The final rank of the moving piece
+	 * @param endFile The final file of the moving piece
+	 * @param moveType What type
+	 * @return The board after the move
 	 */
 	static Piece[][] getBoardAfterMove(Piece[][] oldBoard, int startRank, int startFile, int endRank, int endFile, int moveType) {
 		Piece[][] newBoard = new Piece[10][10];
-		for(int rank = 1; rank <= 8; rank++) {
-			for(int file = 1; file <= 8; file++) {
-				newBoard[rank][file] = oldBoard[rank][file];
-			}
-		}
+		for(int rank = 1; rank <= 8; rank++)
+			System.arraycopy(oldBoard[rank], 1, newBoard[rank], 1, 8);
 		newBoard[endRank][endFile] = newBoard[startRank][startFile];
 		newBoard[startRank][startFile] = new Piece(Piece.EMPTY);
 		if(moveType == 2) { // EN PASSANT
@@ -481,10 +478,10 @@ abstract class MoveRules {
 
     /**
      * Detects whether one side has checkmated
-     * @param board the current board state
-     * @param doneMoveStack all completed moves
-     * @param whiteToMove which side moves next
-     * @return whether one side has checkmated
+     * @param board The current board state
+     * @param doneMoveStack All completed moves
+     * @param whiteToMove Which side moves next
+     * @return Whether one side has checkmated
      */
 	static boolean isCheckmate(Piece[][] board, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
 	    int sideToMove;
@@ -518,10 +515,10 @@ abstract class MoveRules {
 
     /**
      * Detects whether one side has stalemated
-     * @param board the current board state
-     * @param doneMoveStack all completed moves
-     * @param whiteToMove which side moves next
-     * @return whether one side has stalemated
+     * @param board The current board state
+     * @param doneMoveStack All completed moves
+     * @param whiteToMove Which side moves next
+     * @return Whether one side has stalemated
      */
     static boolean isStalemate(Piece[][] board, ArrayDeque<State> doneMoveStack, boolean whiteToMove) {
         int sideToMove;

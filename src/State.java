@@ -2,7 +2,7 @@
  * <code>State</code> class. Logs board state at a point in time.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.2
+ * @version 0.9.3
  * @since 23 APR 2020
  */
 public class State {
@@ -17,6 +17,10 @@ public class State {
         this.board = board;
     }
     
+    /**
+     * Getter method to return the board.
+     * @return the board state stored.
+     */
     Piece[][] getBoard() {
         return board;
     }
