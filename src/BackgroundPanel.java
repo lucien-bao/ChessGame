@@ -8,13 +8,13 @@ import java.io.*;
  * <code>BackgroundPanel</code> class. Displays the background image.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.3
+ * @version 0.9.4
  * @since 22 APR 2020
  */
 public class BackgroundPanel extends JPanel {
 	// CONSTANTS //
 	// Ideal_Width/Ideal_Height [i.e. screen dimensions]
-	double imageRatio = 1440 / 900.0;
+	final static double IMAGE_RATIO = 1440 / 900.0;
 	final RenderingHints RENDERING_HINTS = new RenderingHints(
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
@@ -55,7 +55,7 @@ public class BackgroundPanel extends JPanel {
 		graphics2d.setRenderingHints(RENDERING_HINTS);
 		int x = 0;
 		int y = 0;
-		if((double) panelWidth/panelHeight > imageRatio)
+		if((double) panelWidth/panelHeight > IMAGE_RATIO)
 			y = (panelHeight-imageHeight)/2;
 		else
 			x = (panelWidth-imageWidth)/2;
@@ -73,9 +73,9 @@ public class BackgroundPanel extends JPanel {
 		this.panelHeight = height;
 		this.imageWidth = width;
 		this.imageHeight = height;
-		if(this.panelWidth > this.panelHeight)
-			this.imageHeight = (int) (this.imageWidth / imageRatio);
+		if((double)this.panelWidth/this.panelHeight > IMAGE_RATIO)
+			this.imageHeight = (int) (this.imageWidth /IMAGE_RATIO);
 		else
-			this.imageWidth = (int) (this.imageHeight * imageRatio);
+			this.imageWidth = (int) (this.imageHeight *IMAGE_RATIO);
 	}
 }

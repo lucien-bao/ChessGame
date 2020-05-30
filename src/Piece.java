@@ -6,7 +6,7 @@ import java.io.*;
  * <code>Piece</code> class. Types of pieces and their possible doneMoveStack.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.8
+ * @version 0.9.9
  * @since 4 APR 2020
  */
 class Piece {
@@ -55,9 +55,9 @@ class Piece {
 	static BufferedImage[] labels;
 	
 	// FIELDS //
-	int teamColor;
-	int type;
-	boolean hasMoved;
+	private int teamColor;
+	private int type;
+	private boolean hasMoved;
 	
 	// CONSTRUCTORS //
 	
@@ -113,5 +113,36 @@ class Piece {
 		}
 		
 		System.out.println(String.format("%02.2f%% of images loaded.", (float)loaded/total*100));
+	}
+	
+	/**
+	 * Say this piece has moved.
+	 */
+	void setHasMoved() {
+		this.hasMoved = true;
+	}
+	
+	/**
+	 * Get whether this piece has moved.
+	 * @return <code>true</code> if it has; <code>false</code> if it hasn't.
+	 */
+	boolean getHasMoved() {
+		return this.hasMoved;
+	}
+	
+	/**
+	 * Get the team color for this piece.
+	 * @return <code>Piece.WHITE</code> or <code>Piece.BLACK</code>, depending on the team color.
+	 */
+	public int getTeamColor() {
+		return teamColor;
+	}
+	
+	/**
+	 * Get the type of this piece.
+	 * @return The constant pertaining to the piece's type.
+	 */
+	public int getType() {
+		return type;
 	}
 }

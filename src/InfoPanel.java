@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.6
+ * @version 0.9.7
  * @since 4 APR 2020
  */
 public class InfoPanel extends JPanel implements ActionListener, BoardStateListener {
@@ -20,13 +20,12 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
-	JButton newGameButton;
-	BoardPanel boardPanel;
 	
 	// FIELDS //
 	int width, height;
-	int checkmateStatus; // 0 is none, 1 is white, 2 is black
-	int stalemateStatus;
+	int gameStatus; // 0 -> playing, 1 -> white, 2 -> black, -1 -> stalemate
+	JButton newGameButton;
+	BoardPanel boardPanel;
 	JLabel gameOverLabel;
 	
 	// CONSTRUCTOR //
@@ -37,12 +36,12 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	 */
 	InfoPanel(BoardPanel boardPanel) {
 		this.setOpaque(false);
-		newGameButton = new JButton("New Game");
+		this.boardPanel = boardPanel;
+		this.gameStatus = 0;
+		
+		this.newGameButton = new JButton("New Game");
 		newGameButton.addActionListener(this);
 		this.add(newGameButton);
-		this.boardPanel = boardPanel;
-		this.checkmateStatus = 0;
-		this.stalemateStatus = 0;
 		gameOverLabel = new JLabel("");
 		this.add(gameOverLabel);
 	}
@@ -61,8 +60,8 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	}
 	
 	/**
-	 * Not used.
-	 * @param e -
+	 * Redraws stuff.
+	 * @param graphics The <code>Graphics</code> instance used to draw.
 	 */
 	@Override
 	public void paintComponent(Graphics graphics) {
@@ -74,27 +73,25 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 		graphics2d.fillRect(0, 0, width, height);
 
 		graphics2d.setColor(Color.BLACK);
-		if(checkmateStatus == 1)
+		if(gameStatus == 1)
 			gameOverLabel.setText("White wins");
-		else if(checkmateStatus == 2)
+		else if(gameStatus == 2)
 			gameOverLabel.setText("Black wins");
-		else if(stalemateStatus != 0)
+		else if(gameStatus == -1)
 			gameOverLabel.setText("Draw by stalemate");
 	}
 	
 	/**
-	 * Not used.
-	 * @param e -
+	 * Listens for actions.
+	 * @param e The <code>ActionEvent</code> passed from the event thread.
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == newGameButton) {
 			boardPanel.setBoard();
-			boardPanel.checkmateStatus = 0;
-			boardPanel.stalemateStatus = 0;
-			checkmateStatus = 0;
-			stalemateStatus = 0;
-			gameOverLabel.setText("");
+			boardPanel.gameStatus = 0;
+			this.gameStatus = 0;
+			this.gameOverLabel.setText("");
 			boardPanel.repaint();
 		}
 	}
@@ -104,8 +101,7 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	 */
 	@Override
 	public void gameIsOver() {
-		this.checkmateStatus = boardPanel.checkmateStatus;
-		this.stalemateStatus = boardPanel.stalemateStatus;
+		this.gameStatus = boardPanel.gameStatus;
 		this.repaint();
 	}
 }

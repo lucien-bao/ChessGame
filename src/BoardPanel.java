@@ -7,31 +7,39 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.21
+ * @version 0.9.22
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	// CONSTANTS //
 	
-	// How to get RGBA from int:
-	// take the last 24 bits, then concatenate the alpha value at the front,
-	// which is [some color]_ALPHA expressed in binary form out of 255
-	final int LIGHT_SQUARE_OPAQUE   = Color.HSBtoRGB(0, 0, 0.9f);
+	/*
+	How to get RGBA from int:
+	take the last 24 bits, then concatenate the alpha value at the front,
+	which is [some color]_ALPHA expressed in binary form out of 255
+	 */
+	final int LIGHT_SQUARE_OPAQUE   = Color.HSBtoRGB(0, 0, 0.8f);
 	final int DARK_SQUARE_OPAQUE    = Color.HSBtoRGB(0, 0, 0.4f);
 	// Transparency value of the board, so that you can see the background through it
-	float BOARD_ALPHA               = 0.5f;
-	final int LIGHT_SQUARE_RGBA     = (LIGHT_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
-	final int DARK_SQUARE_RGBA      = (DARK_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
+	final float LIGHT_ALPHA         = 0.5f;
+	final float DARK_ALPHA          = 0.5f;
+	final float BOARD_ALPHA         = 0.5f;
+	
+	final int LIGHT_SQUARE_RGBA     = (LIGHT_SQUARE_OPAQUE & 16777215) | ((int) (LIGHT_ALPHA*255) << 24);
+	final int DARK_SQUARE_RGBA      = (DARK_SQUARE_OPAQUE & 16777215) | ((int) (DARK_ALPHA*255) << 24);
+	final int BOARD_RGBA            = (DARK_SQUARE_OPAQUE & 16777215) | ((int) (BOARD_ALPHA*255) << 24);
 	final Color LIGHT_SQUARE_COLOR 	= new Color(LIGHT_SQUARE_RGBA, true);
 	final Color DARK_SQUARE_COLOR 	= new Color(DARK_SQUARE_RGBA, true);
-	final Color BACKGROUND_COLOR    = DARK_SQUARE_COLOR;
+	final Color BACKGROUND_COLOR    = new Color(BOARD_RGBA, true);
 	
-	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.7f);
-	final float POSS_MOVE_ALPHA     = 0.9f;
+	final int POSS_MOVE_OPAQUE      = Color.HSBtoRGB(0, 0, 0.9f);
+	final float POSS_MOVE_ALPHA     = 0.7f;
 	final int POSS_MOVE_RGBA        = (POSS_MOVE_OPAQUE & 16777215) | ((int) (POSS_MOVE_ALPHA*255) << 24);
 	final Color POSS_MOVE_COLOR     = new Color(POSS_MOVE_RGBA, true);
 
 	final RenderingHints RENDERING_HINTS;
+	
+	final String[] PROMOTION_OPTIONS = {"Bishop", "Knight", "Rook", "Queen"};
 	
 	// FIELDS //
 	Piece[][] grid;
@@ -42,8 +50,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	int outsideGrid;
 	int selectedRank;
 	int selectedFile;
-	int checkmateStatus;
-	int stalemateStatus;
+	int gameStatus; // 0 -> playing, 1 -> white, 2 -> black, -1 -> stalemate
 	boolean whiteToMove;
 	HashSet<BoardStateListener> listenerSet;
 	
@@ -79,8 +86,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         selectedFile = 0;
         
         whiteToMove = true;
-        checkmateStatus = 0; // 0 is neither team, 1 is white, 2 is black
-		stalemateStatus = 0;
+        this.gameStatus = 0;
         
         doneMoveStack = new ArrayDeque<>();
         undoneMoveStack = new ArrayDeque<>();
@@ -125,13 +131,13 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		undoneMoveStack.clear();
 		grid[endRank][endFile] = grid[startRank][startFile];
 		grid[startRank][startFile] = new Piece(Piece.EMPTY);
-		if(moveType == 2) { // EN PASSANT
-			if(grid[endRank][endFile].teamColor == Piece.WHITE) {   // WHITE EN PASSANT
+		if(moveType == MoveRules.EN_PASSANT) { // EN PASSANT
+			if(grid[endRank][endFile].getTeamColor() == Piece.WHITE) {   // WHITE EN PASSANT
 				grid[endRank+1][endFile] = new Piece(Piece.EMPTY);
 			} else {                                                // BLACK EN PASSANT
 				grid[endRank-1][endFile] = new Piece(Piece.EMPTY);
 			}
-		} else if(moveType == 3) { // CASTLING
+		} else if(moveType == MoveRules.CASTLE) { // CASTLING
 			if(endFile > startFile) { // KINGSIDE
 				grid[endRank][6] = grid[endRank][8];
 				grid[endRank][8] = new Piece(Piece.EMPTY);
@@ -139,20 +145,56 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 				grid[endRank][4] = grid[endRank][1];
 				grid[endRank][1] = new Piece(Piece.EMPTY);
 			}
+		} else if(moveType == MoveRules.PROMOTION) { // PROMOTION
+			int piece = JOptionPane.showOptionDialog(
+				this,                               // Parent component
+				"Select a piece to promote to",     // Message
+				"Promotion",                        // Title
+				JOptionPane.YES_NO_CANCEL_OPTION,	// Option type
+				JOptionPane.QUESTION_MESSAGE,       // Message type
+				null,                               // Icon,
+				PROMOTION_OPTIONS,                  // Options
+				PROMOTION_OPTIONS[3]                // Default option
+			);
+			switch(piece) {
+				case 0: {   // BISHOP
+					if(whiteToMove)
+						grid[endRank][endFile] = new Piece(Piece.WHITE_BISHOP);
+					else 
+						grid[endRank][endFile] = new Piece(Piece.BLACK_BISHOP);
+					break;
+				} case 1: { // KNIGHT
+					if(whiteToMove)
+						grid[endRank][endFile] = new Piece(Piece.WHITE_KNIGHT);
+					else
+						grid[endRank][endFile] = new Piece(Piece.BLACK_KNIGHT);
+					break;
+				} case 2: { // ROOK
+					if(whiteToMove)
+						grid[endRank][endFile] = new Piece(Piece.WHITE_ROOK);
+					else
+						grid[endRank][endFile] = new Piece(Piece.BLACK_ROOK);
+					break;
+				} case 3: { // QUEEN
+					if(whiteToMove)
+						grid[endRank][endFile] = new Piece(Piece.WHITE_QUEEN);
+					else
+						grid[endRank][endFile] = new Piece(Piece.BLACK_QUEEN);
+					break;
+				}
+			}
 		}
-		grid[endRank][endFile].hasMoved = true;
+		grid[endRank][endFile].setHasMoved();
 		whiteToMove = !whiteToMove;
 		boolean isCheckmate = MoveRules.isCheckmate(grid, doneMoveStack, whiteToMove);
 		if(whiteToMove && isCheckmate) // white has been checkmated
-			checkmateStatus = Piece.BLACK;
+			gameStatus = Piece.BLACK;
 		else if(isCheckmate)
-			checkmateStatus = Piece.WHITE;
+			gameStatus = Piece.WHITE;
 
 		boolean isStalemate = MoveRules.isStalemate(grid, doneMoveStack, whiteToMove);
-		if(whiteToMove && isStalemate) // white has been stalemated
-			stalemateStatus = Piece.BLACK;
-		else if(isStalemate)
-			stalemateStatus = Piece.WHITE;
+		if(isStalemate) // white has been stalemated
+			gameStatus = MoveRules.STALEMATE;
 	}
 	
 	/**
@@ -239,9 +281,9 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         // PIECES
         for(int rank = 1; rank <= 8; rank++) {
         	for(int file = 1; file <= 8; file++) {
-		        if(grid[rank][file].type != Piece.EMPTY)
+		        if(grid[rank][file].getType() != Piece.EMPTY)
 			        graphics2d.drawImage(
-			        		Piece.pieces[0][grid[rank][file].type],
+			        		Piece.pieces[0][grid[rank][file].getType()],
 			        		outsideGrid / 2 + squareSize * file,
 					        outsideGrid / 2 + squareSize * rank,
 					        squareSize, squareSize,
@@ -252,14 +294,23 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		// POSS. MOVES
 		int[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
 		graphics2d.setColor(POSS_MOVE_COLOR);
+		graphics2d.setStroke(new BasicStroke(2));
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
-				if(possibleMoves[moveRank][moveFile] != 0)
+				if(possibleMoves[moveRank][moveFile] != MoveRules.NONE) {
+					int diff = squareSize % 2;
 					graphics2d.fillOval(
-							outsideGrid / 2 + squareSize * moveFile + squareSize / 4,
-							outsideGrid / 2 + squareSize * moveRank + squareSize / 4,
-							squareSize / 2, squareSize / 2);
-		if(checkmateStatus != 0 || stalemateStatus != 0)
+						outsideGrid/2+squareSize*moveFile+squareSize/4,
+						outsideGrid/2+squareSize*moveRank+squareSize/4,
+						squareSize/2+diff, squareSize/2+diff
+					);
+					graphics2d.drawOval(
+						outsideGrid/2+squareSize*moveFile+squareSize*3/16,
+						outsideGrid/2+squareSize*moveRank+squareSize*3/16,
+						squareSize*5/8, squareSize*5/8
+					);
+				}
+		if(gameStatus != MoveRules.PLAYING)
 			notifyListeners();
 	}
 	
@@ -345,26 +396,26 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
 		if(clickedRank >= 1 && clickedRank <= 8 && clickedFile >= 1 && clickedFile <= 8) {
-			if(selectedFile != 0) {     // PIECE IS SELECTED
+			if(selectedFile != 0) { // PIECE IS SELECTED
 				int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
 				int moveType = possMoves[clickedRank][clickedFile];
 				if(moveType != 0) {          // PERFORM VALID MOVE
 					doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
 					selectedRank = 0;
 					selectedFile = 0;
-				} else if(grid[selectedRank][selectedFile].teamColor ==
-						grid[clickedRank][clickedFile].teamColor) {     // SWITCH SELECTED PIECE
+				} else if(grid[selectedRank][selectedFile].getTeamColor() ==
+						grid[clickedRank][clickedFile].getTeamColor()) {     // SWITCH SELECTED PIECE
 					selectedRank = clickedRank;
 					selectedFile = clickedFile;
 				} else {                                                // DESELECT PIECE
 					selectedRank = 0;
 					selectedFile = 0;
 				}
-			} else {                    // NOTHING SELECTED
-				if(whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.WHITE) {
+			} else {                // NOTHING SELECTED
+				if(whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) {
 					selectedRank = clickedRank;
 					selectedFile = clickedFile;
-				} else if(!whiteToMove && grid[clickedRank][clickedFile].teamColor == Piece.BLACK) {
+				} else if(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK) {
 					selectedRank = clickedRank;
 					selectedFile = clickedFile;
 				}
