@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.22
+ * @version 0.9.23
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -202,9 +202,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 */
 	void undoMove() {
 		State lastBoardState = doneMoveStack.pop();
+		undoneMoveStack.push(new State(grid));
 		grid = lastBoardState.getBoard();
 		whiteToMove = !whiteToMove;
-		undoneMoveStack.push(lastBoardState);
+
 	}
 	
 	/**
@@ -212,9 +213,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 */
 	void redoMove() {
 		State lastBoardState = undoneMoveStack.pop();
+		doneMoveStack.push(new State(grid));
 		grid = lastBoardState.getBoard();
 		whiteToMove = !whiteToMove;
-		doneMoveStack.push(lastBoardState);
+
 	}
 	
 	/**
@@ -342,6 +344,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * Sets the board to the starting position.
 	 */
 	void setBoard() {
+        doneMoveStack = new ArrayDeque<>();
+        undoneMoveStack = new ArrayDeque<>();
 		whiteToMove = true;
 
 		for(int rank = 1; rank <= 8; rank++) {

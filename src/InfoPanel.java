@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.7
+ * @version 0.9.8
  * @since 4 APR 2020
  */
 public class InfoPanel extends JPanel implements ActionListener, BoardStateListener {
@@ -25,6 +25,8 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	int width, height;
 	int gameStatus; // 0 -> playing, 1 -> white, 2 -> black, -1 -> stalemate
 	JButton newGameButton;
+	JButton undoMoveButton;
+	JButton redoMoveButton;
 	BoardPanel boardPanel;
 	JLabel gameOverLabel;
 	
@@ -42,6 +44,15 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 		this.newGameButton = new JButton("New Game");
 		newGameButton.addActionListener(this);
 		this.add(newGameButton);
+
+		this.undoMoveButton = new JButton("Undo Move");
+		undoMoveButton.addActionListener(this);
+		this.add(undoMoveButton);
+
+		this.redoMoveButton = new JButton("Redo Move");
+		redoMoveButton.addActionListener(this);
+		this.add(redoMoveButton);
+
 		gameOverLabel = new JLabel("");
 		this.add(gameOverLabel);
 	}
@@ -92,8 +103,15 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 			boardPanel.gameStatus = 0;
 			this.gameStatus = 0;
 			this.gameOverLabel.setText("");
-			boardPanel.repaint();
+		} else if(e.getSource() == undoMoveButton) {
+			if(boardPanel.doneMoveStack.size() > 0)
+				boardPanel.undoMove();
+		} else if(e.getSource() == redoMoveButton) {
+			if(boardPanel.undoneMoveStack.size() > 0) {
+				boardPanel.redoMove();
+			}
 		}
+		boardPanel.repaint();
 	}
 	
 	/**
