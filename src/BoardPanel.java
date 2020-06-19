@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.23
+ * @version 0.9.24
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -125,8 +125,11 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 */
 	void doMove(int startRank, int startFile, int endRank, int endFile, int moveType) {
 		Piece[][] gridCopy = new Piece[10][10];
-		for(int i = 0; i < 10; i++)
-			System.arraycopy(grid[i], 0, gridCopy[i], 0, 10);
+		for(int rank = 0; rank < 10; rank++) {
+			for(int file = 0; file < 10; file++) {
+				gridCopy[rank][file] = new Piece(grid[rank][file]);
+			}
+		}
 		doneMoveStack.push(new State(gridCopy));
 		undoneMoveStack.clear();
 		grid[endRank][endFile] = grid[startRank][startFile];
@@ -205,7 +208,6 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		undoneMoveStack.push(new State(grid));
 		grid = lastBoardState.getBoard();
 		whiteToMove = !whiteToMove;
-
 	}
 	
 	/**
@@ -395,7 +397,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		When a piece is NOT selected:
 		  If click on valid friendly piece, select that piece
 		*/
-		
+		/*
 		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
 		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
 
@@ -426,6 +428,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 			}
 		}
 		repaint();
+
+		 */
 	}
 	
 	/**
@@ -433,14 +437,46 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * @param e -
 	 */
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {
+		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
+		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
+
+		if(clickedRank >= 1 && clickedRank <= 8 && clickedFile >= 1 && clickedFile <= 8) {
+			if(selectedRank == 0) { // NOTHING IS SELECTED
+				if((whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) ||
+						(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK)) {
+					selectedRank = clickedRank;
+					selectedFile = clickedFile;
+				}
+			} else { // FRIENDLY PIECE SELECTED
+				// FRIENDLY PIECE CLICKED
+				if((whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) ||
+						(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK)) {
+					selectedRank = clickedRank;
+					selectedFile = clickedFile;
+				} else { // EMPTY / ENEMY PIECE CLICKED
+					int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
+					int moveType = possMoves[clickedRank][clickedFile];
+					if(moveType != 0) {          // PERFORM VALID MOVE
+						doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
+					}
+					selectedRank = selectedFile = 0;
+				}
+			}
+		}
+
+		repaint();
+	}
 	
 	/**
 	 * Not used.
 	 * @param e -
 	 */
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+
+		repaint();
+	}
 	
 	/**
 	 * Not used.
@@ -462,7 +498,8 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * @param e -
 	 */
 	@Override
-	public void mouseDragged(MouseEvent e) {}
+	public void mouseDragged(MouseEvent e) {
+	}
 	
 	/**
 	 * Not used.

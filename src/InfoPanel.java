@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
  * <code>InfoPanel</code> class. This displays information relevant to the game.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.8
+ * @version 0.9.9
  * @since 4 APR 2020
  */
 public class InfoPanel extends JPanel implements ActionListener, BoardStateListener {
@@ -20,6 +20,8 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON
 	);
+	final double BUTTON_WIDTH_RATIO = 1;
+	final double BUTTON_HEIGHT_RATIO = 0.05;
 	
 	// FIELDS //
 	int width, height;
@@ -37,20 +39,24 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	 * @param boardPanel The <code>BoardPanel</code> instance from <code>Frame</code>.
 	 */
 	InfoPanel(BoardPanel boardPanel) {
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
 		this.setOpaque(false);
 		this.boardPanel = boardPanel;
 		this.gameStatus = 0;
 		
 		this.newGameButton = new JButton("New Game");
 		newGameButton.addActionListener(this);
-		this.add(newGameButton);
 
 		this.undoMoveButton = new JButton("Undo Move");
 		undoMoveButton.addActionListener(this);
-		this.add(undoMoveButton);
 
 		this.redoMoveButton = new JButton("Redo Move");
 		redoMoveButton.addActionListener(this);
+
+		setButtonSize();
+		this.add(newGameButton);
+		this.add(undoMoveButton);
 		this.add(redoMoveButton);
 
 		gameOverLabel = new JLabel("");
@@ -68,6 +74,18 @@ public class InfoPanel extends JPanel implements ActionListener, BoardStateListe
 	void changeSize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		setButtonSize();
+	}
+
+	void setButtonSize() {
+		newGameButton.setMinimumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
+		newGameButton.setMaximumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
+
+		undoMoveButton.setMinimumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
+		undoMoveButton.setMaximumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
+
+		redoMoveButton.setMinimumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
+		redoMoveButton.setMaximumSize(new Dimension((int)(width * BUTTON_WIDTH_RATIO), (int)(height * BUTTON_HEIGHT_RATIO)));
 	}
 	
 	/**

@@ -6,7 +6,7 @@ import java.io.*;
  * <code>Piece</code> class. Types of pieces and their possible doneMoveStack.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.9
+ * @version 0.9.10
  * @since 4 APR 2020
  */
 class Piece {
@@ -75,6 +75,12 @@ class Piece {
 			this.teamColor = BLACK;
 		this.hasMoved = false;
 	}
+
+	Piece(Piece piece) {
+		this.type = piece.type;
+		this.teamColor = piece.teamColor;
+		this.hasMoved = piece.hasMoved;
+	}
 	
 	// METHODS //
 	
@@ -111,8 +117,6 @@ class Piece {
 		} catch(IOException e) {
 			System.out.println(String.format("Image loading failed: label %d", i));
 		}
-		
-		System.out.println(String.format("%02.2f%% of images loaded.", (float)loaded/total*100));
 	}
 	
 	/**
