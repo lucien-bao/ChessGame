@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.24
+ * @version 0.9.25
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -60,6 +60,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	ArrayDeque<State> doneMoveStack;
 	ArrayDeque<State> undoneMoveStack;
 	
+	int mouseX;
+	int mouseY;
+	boolean mousePressed;
+	
 	// CONSTRUCTORS //
 	
 	/**
@@ -69,6 +73,7 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		// Forces Java to recognize drawing of panels beneath this one (i.e. BackgroundPanel)
 		this.setOpaque(false);
 		addMouseListener(this);
+		addMouseMotionListener(this);
 		
 		RENDERING_HINTS = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -84,6 +89,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 
         selectedRank = 0;
         selectedFile = 0;
+        
+        mouseX = 0;
+        mouseY = 0;
+        mousePressed = false;
         
         whiteToMove = true;
         this.gameStatus = 0;
@@ -286,15 +295,25 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
         for(int rank = 1; rank <= 8; rank++) {
         	for(int file = 1; file <= 8; file++) {
 		        if(grid[rank][file].getType() != Piece.EMPTY)
-			        graphics2d.drawImage(
-			        		Piece.pieces[0][grid[rank][file].getType()],
-			        		outsideGrid / 2 + squareSize * file,
-					        outsideGrid / 2 + squareSize * rank,
-					        squareSize, squareSize,
-                            this
-			        );
+		        	if(mousePressed && selectedRank == rank & selectedFile == file) // Ghost piece
+				        graphics2d.drawImage(
+				        		Piece.pieces[0][grid[rank][file].getType()],
+						        mouseX-squareSize/2,
+						        mouseY-squareSize/2,
+						        squareSize, squareSize,
+						        this
+				        );
+		        	else                                                            // Normal
+				        graphics2d.drawImage(
+						        Piece.pieces[0][grid[rank][file].getType()],
+						        outsideGrid / 2 + squareSize * file,
+						        outsideGrid / 2 + squareSize * rank,
+						        squareSize, squareSize,
+						        this
+				        );
 	        }
         }
+        
 		// POSS. MOVES
 		int[][] possibleMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
 		graphics2d.setColor(POSS_MOVE_COLOR);
@@ -383,83 +402,41 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Processes mouse-clicking events.
-	 * @param e The <code>MouseEvent</code> given by the event thread.
-	 */
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		/*
-		NOTE: default value is (0, 0) --> if selected coords equals it, then ignore that selection
-		When a piece is selected:
-		  If click on valid move, perform that move
-		  (Else) If click on valid friendly piece, select that piece
-		  Else (Click is on non-valid square), deselect
-		When a piece is NOT selected:
-		  If click on valid friendly piece, select that piece
-		*/
-		/*
-		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
-		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
-
-		if(clickedRank >= 1 && clickedRank <= 8 && clickedFile >= 1 && clickedFile <= 8) {
-			if(selectedFile != 0) { // PIECE IS SELECTED
-				int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
-				int moveType = possMoves[clickedRank][clickedFile];
-				if(moveType != 0) {          // PERFORM VALID MOVE
-					doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
-					selectedRank = 0;
-					selectedFile = 0;
-				} else if(grid[selectedRank][selectedFile].getTeamColor() ==
-						grid[clickedRank][clickedFile].getTeamColor()) {     // SWITCH SELECTED PIECE
-					selectedRank = clickedRank;
-					selectedFile = clickedFile;
-				} else {                                                // DESELECT PIECE
-					selectedRank = 0;
-					selectedFile = 0;
-				}
-			} else {                // NOTHING SELECTED
-				if(whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) {
-					selectedRank = clickedRank;
-					selectedFile = clickedFile;
-				} else if(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK) {
-					selectedRank = clickedRank;
-					selectedFile = clickedFile;
-				}
-			}
-		}
-		repaint();
-
-		 */
-	}
-	
-	/**
 	 * Not used.
 	 * @param e -
 	 */
 	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	
+	/**
+	 * Handles events when the mouse is pressed down.
+	 * @param e The <code>MouseEvent</code> given.
+	 */
+	@Override
 	public void mousePressed(MouseEvent e) {
-		int clickedRank = (e.getY() - outsideGrid / 2) / squareSize;
-		int clickedFile = (e.getX() - outsideGrid / 2) / squareSize;
+		mousePressed = true;
+		int mouseRank = (e.getY() - outsideGrid / 2) / squareSize;
+		int mouseFile = (e.getX() - outsideGrid / 2) / squareSize;
 
-		if(clickedRank >= 1 && clickedRank <= 8 && clickedFile >= 1 && clickedFile <= 8) {
+		if(mouseRank >= 1 && mouseRank <= 8 && mouseFile >= 1 && mouseFile <= 8) {
 			if(selectedRank == 0) { // NOTHING IS SELECTED
-				if((whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) ||
-						(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK)) {
-					selectedRank = clickedRank;
-					selectedFile = clickedFile;
+				if((whiteToMove && grid[mouseRank][mouseFile].getTeamColor() == Piece.WHITE) ||
+						(!whiteToMove && grid[mouseRank][mouseFile].getTeamColor() == Piece.BLACK)) {
+					selectedRank = mouseRank;
+					selectedFile = mouseFile;
 				}
 			} else { // FRIENDLY PIECE SELECTED
 				// FRIENDLY PIECE CLICKED
-				if((whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.WHITE) ||
-						(!whiteToMove && grid[clickedRank][clickedFile].getTeamColor() == Piece.BLACK)) {
-					selectedRank = clickedRank;
-					selectedFile = clickedFile;
+				if((whiteToMove && grid[mouseRank][mouseFile].getTeamColor() == Piece.WHITE) ||
+						(!whiteToMove && grid[mouseRank][mouseFile].getTeamColor() == Piece.BLACK)) {
+					selectedRank = mouseRank;
+					selectedFile = mouseFile;
 				} else { // EMPTY / ENEMY PIECE CLICKED
 					int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
-					int moveType = possMoves[clickedRank][clickedFile];
-					if(moveType != 0) {          // PERFORM VALID MOVE
-						doMove(selectedRank, selectedFile, clickedRank, clickedFile, moveType);
-					}
+					int moveType = possMoves[mouseRank][mouseFile];
+					if(moveType != 0)          // PERFORM VALID MOVE
+						doMove(selectedRank, selectedFile, mouseRank, mouseFile, moveType);
 					selectedRank = selectedFile = 0;
 				}
 			}
@@ -469,12 +446,28 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	}
 	
 	/**
-	 * Not used.
-	 * @param e -
+	 * Handles events when the mouse is released.
+	 * @param e The <code>MouseEvent</code> given.
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+		mousePressed = false;
+		if(selectedRank == 0)
+			return;
+		
+		int mouseRank = (e.getY() - outsideGrid / 2) / squareSize;
+		int mouseFile = (e.getX() - outsideGrid / 2) / squareSize;
+		
+		if(mouseRank < 0 || mouseRank >= 10 || mouseFile < 0 || mouseFile >= 10) {
+			this.repaint();
+			return;
+		}
+		
+		int[][] possMoves = MoveRules.getPossMoves(grid, selectedRank, selectedFile, doneMoveStack, whiteToMove);
+		int moveType = possMoves[mouseRank][mouseFile];
+		if(moveType != 0)          // PERFORM VALID MOVE
+			doMove(selectedRank, selectedFile, mouseRank, mouseFile, moveType);
+		
 		repaint();
 	}
 	
@@ -492,13 +485,16 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
-	// TODO: alternate method of moving pieces
 	/**
-	 * Not used.
-	 * @param e -
+	 * Handles mouse movement while pressed down.
+	 * @param e The <code>MouseEvent</code> given.
 	 */
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		mouseX = e.getX();
+		mouseY = e.getY();
+		
+		this.repaint();
 	}
 	
 	/**
@@ -506,5 +502,10 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 	 * @param e -
 	 */
 	@Override
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved(MouseEvent e) {
+		mouseX = e.getX();
+		mouseY = e.getY();
+		
+		this.repaint();
+	}
 }

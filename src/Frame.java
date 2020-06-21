@@ -72,7 +72,7 @@ class Frame extends JFrame implements ComponentListener/*, MouseListener*/ {
 		backgroundPanel = new BackgroundPanel();
 		backgroundPanel.setBounds(0, 0, 800, 500);
 		this.add(backgroundPanel);
-
+		
 		boardPanel.addListener(infoPanel);
 		// Misc. setup
 		this.setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT + MENU_BAR_HEIGHT));
