@@ -7,7 +7,7 @@ import java.util.*;
  * <code>BoardPanel</code> class. The chessboard is stored and displayed inside this.
  *
  * @author Chris W. Bao, Ben C. Megan
- * @version 0.9.25
+ * @version 0.9.26
  * @since 4 APR 2020
  */
 class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -321,17 +321,12 @@ class BoardPanel extends JPanel implements MouseListener, MouseMotionListener {
 		for(int moveRank = 1; moveRank <= 8; moveRank++)
 			for(int moveFile = 1; moveFile <= 8; moveFile++)
 				if(possibleMoves[moveRank][moveFile] != MoveRules.NONE) {
-					int diff = squareSize % 2;
-					graphics2d.fillOval(
-						outsideGrid/2+squareSize*moveFile+squareSize/4,
-						outsideGrid/2+squareSize*moveRank+squareSize/4,
-						squareSize/2+diff, squareSize/2+diff
-					);
-					graphics2d.drawOval(
-						outsideGrid/2+squareSize*moveFile+squareSize*3/16,
-						outsideGrid/2+squareSize*moveRank+squareSize*3/16,
-						squareSize*5/8, squareSize*5/8
-					);
+					int cx = (int)(outsideGrid / 2. + squareSize * (moveFile + 0.5));
+					int cy = (int)(outsideGrid / 2. + squareSize * (moveRank + 0.5));
+					int d1 = squareSize / 2;
+					graphics2d.fillOval(cx - d1 / 2, cy - d1 / 2, d1, d1);
+					int d2 = squareSize * 5 / 8;
+					graphics2d.drawOval(cx - d2 / 2, cy - d2 / 2, d2, d2);
 				}
 		if(gameStatus != MoveRules.PLAYING)
 			notifyListeners();
